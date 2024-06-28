@@ -1,0 +1,34 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+.kotlin
+
+# other
+eclipse
+run
+runs
+run-data
+/.vscode/
+
+repo
+
+*.DS_Store
+
+# Blender backup files
+*.blend1
+*.blend2
