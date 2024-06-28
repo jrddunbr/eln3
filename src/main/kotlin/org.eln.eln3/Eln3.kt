@@ -36,48 +36,56 @@ import java.util.function.Supplier
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Eln3.MODID)
-class Eln3 {
+class Eln3// Register the commonSetup method for modloading
+
+// Register the Deferred Register to the mod event bus so blocks get registered
+// Register the Deferred Register to the mod event bus so items get registered
+// Register the Deferred Register to the mod event bus so tabs get registered
+
+// Register ourselves for server and other game events we are interested in.
+// Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
+// Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
+
+// Register the item to a creative tab
+
+// Register our mod's ModConfigSpec so that FML can create and load the config file for us
+    (modEventBus: IEventBus, modContainer: ModContainer) {
     companion object {
         // Define mod id in a common place for everything to reference
-        const val MODID = "examplemod"
+        const val MODID = "eln3"
         // Directly reference a slf4j logger
         private val LOGGER = LogUtils.getLogger();
 
         // Create a Deferred Register to hold Blocks which will all be registered under the "examplemod" namespace
-        val BLOCKS: DeferredRegister.Blocks = DeferredRegister.createBlocks(
-            MODID
-        )
+        val BLOCKS: DeferredRegister.Blocks = DeferredRegister.createBlocks(MODID)
         // Create a Deferred Register to hold Items which will all be registered under the "examplemod" namespace
-        val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(
-            MODID
-        )
+        val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(MODID)
         // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
-        val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> =
-            DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID)
+        val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID)
 
         // Creates a new Block with the id "examplemod:example_block", combining the namespace and path
-        val EXAMPLE_BLOCK: DeferredBlock<Block> =
-            BLOCKS.registerSimpleBlock("example_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE))
+        val TEST_BLOCK: DeferredBlock<Block> = BLOCKS.registerSimpleBlock("test_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE))
         // Creates a new BlockItem with the id "examplemod:example_block", combining the namespace and path
-        val EXAMPLE_BLOCK_ITEM: DeferredItem<BlockItem> = ITEMS.registerSimpleBlockItem("example_block", EXAMPLE_BLOCK)
+        val EXAMPLE_BLOCK_ITEM: DeferredItem<BlockItem> = ITEMS.registerSimpleBlockItem("test_block", TEST_BLOCK)
 
         // Creates a new food item with the id "examplemod:example_id", nutrition 1 and saturation 2
-        val EXAMPLE_ITEM: DeferredItem<Item> = ITEMS.registerSimpleItem(
-            "example_item", Item.Properties().food(
+        val TEST_ITEM: DeferredItem<Item> = ITEMS.registerSimpleItem(
+            "test_item", Item.Properties().food(
                 FoodProperties.Builder()
                     .alwaysEdible().nutrition(1).saturationModifier(2f).build()
             )
         )
 
         // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
-        val EXAMPLE_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = CREATIVE_MODE_TABS.register("example_tab",
+        val ELN3_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = CREATIVE_MODE_TABS.register(
+            MODID,
             Supplier {
                 CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.examplemod")) //The language key for the title of your CreativeModeTab
+                    .title(Component.translatable("itemGroup.$MODID")) //The language key for the title of your CreativeModeTab
                     .withTabsBefore(CreativeModeTabs.COMBAT)
-                    .icon { EXAMPLE_ITEM.get().defaultInstance }
+                    .icon { TEST_ITEM.get().defaultInstance }
                     .displayItems { parameters: ItemDisplayParameters?, output: CreativeModeTab.Output ->
-                        output.accept(EXAMPLE_ITEM.get()) // Add the example item to the tab. For your own tabs, this method is preferred over the event
+                        output.accept(TEST_ITEM.get()) // Add the example item to the tab. For your own tabs, this method is preferred over the event
                     }.build()
             })
 
@@ -93,26 +101,13 @@ class Eln3 {
         }
     }
 
-    constructor(modEventBus: IEventBus, modContainer: ModContainer) {
-        // Register the commonSetup method for modloading
+    init {
         modEventBus.addListener(::commonSetup)
-
-        // Register the Deferred Register to the mod event bus so blocks get registered
         BLOCKS.register(modEventBus)
-        // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus)
-        // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus)
-
-        // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this)
-
-        // Register the item to a creative tab
         modEventBus.addListener(::addCreative)
-
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC)
     }
 
