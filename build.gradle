@@ -105,6 +105,9 @@ dependencies {
     // Since Kotlin is its own JVM language with its own standard library, a custom language loader needs to be used, i.e. KFF
     implementation("thedarkcolour:kotlinforforge-neoforge:$kff_version")
 
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    implementation("org.apache.commons:commons-math3:3.6.1")
+
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"

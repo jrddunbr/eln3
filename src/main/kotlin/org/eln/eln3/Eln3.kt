@@ -2,10 +2,10 @@ package org.eln.eln3
 
 import com.mojang.logging.LogUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
-import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.CreativeModeTab
 import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters
@@ -13,7 +13,9 @@ import net.minecraft.world.item.CreativeModeTabs
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.MapColor
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.IEventBus
@@ -27,34 +29,38 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
 import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent
 import net.neoforged.neoforge.event.server.ServerStartingEvent
+import net.neoforged.neoforge.event.tick.ServerTickEvent
+import net.neoforged.neoforge.event.tick.ServerTickEvent.Pre
 import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
+import org.eln.eln3.sim.MnaConst
+import org.eln.eln3.sim.Simulator
+import org.eln.eln3.single.SingleTestBlock
+import org.eln.eln3.single.SingleTestBlockEntity
+import org.eln.eln3.technical.TechnicalManager
 import java.util.function.Consumer
 import java.util.function.Supplier
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Eln3.MODID)
-class Eln3// Register the commonSetup method for modloading
+class Eln3
 
-// Register the Deferred Register to the mod event bus so blocks get registered
-// Register the Deferred Register to the mod event bus so items get registered
-// Register the Deferred Register to the mod event bus so tabs get registered
-
-// Register ourselves for server and other game events we are interested in.
-// Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
-// Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
-
-// Register the item to a creative tab
-
-// Register our mod's ModConfigSpec so that FML can create and load the config file for us
     (modEventBus: IEventBus, modContainer: ModContainer) {
     companion object {
         // Define mod id in a common place for everything to reference
         const val MODID = "eln3"
         // Directly reference a slf4j logger
-        private val LOGGER = LogUtils.getLogger();
+        val LOGGER = LogUtils.getLogger();
+
+        @JvmStatic
+        val simulator = Simulator(
+            MnaConst.ELECTRICAL_FREQUENCY,
+            MnaConst.ELECTRICAL_FREQUENCY,
+            MnaConst.ELECTRICAL_OVERSAMPLING.toInt(),
+            MnaConst.THERMAL_FREQUENCY
+        )
 
         // Create a Deferred Register to hold Blocks which will all be registered under the "examplemod" namespace
         val BLOCKS: DeferredRegister.Blocks = DeferredRegister.createBlocks(MODID)
@@ -63,18 +69,32 @@ class Eln3// Register the commonSetup method for modloading
         // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
         val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID)
 
+        val BLOCK_ENTITY_TYPES: DeferredRegister<BlockEntityType<*>> = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, MODID)
+
         // Creates a new Block with the id "examplemod:example_block", combining the namespace and path
         val TEST_BLOCK: DeferredBlock<Block> = BLOCKS.registerSimpleBlock("test_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE))
         // Creates a new BlockItem with the id "examplemod:example_block", combining the namespace and path
         val EXAMPLE_BLOCK_ITEM: DeferredItem<BlockItem> = ITEMS.registerSimpleBlockItem("test_block", TEST_BLOCK)
 
-        // Creates a new food item with the id "examplemod:example_id", nutrition 1 and saturation 2
-        val TEST_ITEM: DeferredItem<Item> = ITEMS.registerSimpleItem(
-            "test_item", Item.Properties().food(
-                FoodProperties.Builder()
-                    .alwaysEdible().nutrition(1).saturationModifier(2f).build()
-            )
-        )
+        val TEST_ITEM: DeferredItem<Item> = ITEMS.registerSimpleItem("test_item")
+
+        val stbs: Supplier<SingleTestBlock> = Supplier {SingleTestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE))}
+        val SIMPLE_TEST_BLOCK = BLOCKS.register("simple_test_block", stbs)
+
+        val SIMPLE_TEST_BLOCK_ITEM = ITEMS.registerSimpleBlockItem(SIMPLE_TEST_BLOCK)
+
+        val cool = fun (pos: BlockPos, state: BlockState): SingleTestBlockEntity {
+            return SingleTestBlockEntity(SIMPLE_BLOCK_ENTITY.get(), pos, state)
+        }
+
+        //val cool: (pos: BlockPos, state: BlockState) -> SingleTestBlockEntity = {(pos, state) -> SingleTestBlockEntity(SIMPLE_BLOCK_ENTITY.get(), pos, state)}
+        val SIMPLE_BLOCK_ENTITY: Supplier<BlockEntityType<SingleTestBlockEntity>> =
+            BLOCK_ENTITY_TYPES.register("simple_block_entity", Supplier { BlockEntityType.Builder.of(
+                cool,
+                SIMPLE_TEST_BLOCK.get()
+            ).build(null) })
+
+
 
         // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
         val ELN3_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = CREATIVE_MODE_TABS.register(
@@ -86,6 +106,7 @@ class Eln3// Register the commonSetup method for modloading
                     .icon { TEST_ITEM.get().defaultInstance }
                     .displayItems { parameters: ItemDisplayParameters?, output: CreativeModeTab.Output ->
                         output.accept(TEST_ITEM.get()) // Add the example item to the tab. For your own tabs, this method is preferred over the event
+                        output.accept(SIMPLE_TEST_BLOCK_ITEM.get())
                     }.build()
             })
 
@@ -102,29 +123,24 @@ class Eln3// Register the commonSetup method for modloading
     }
 
     init {
-        modEventBus.addListener(::commonSetup)
-        BLOCKS.register(modEventBus)
-        ITEMS.register(modEventBus)
-        CREATIVE_MODE_TABS.register(modEventBus)
+        modEventBus.addListener(::commonSetup) // Register the commonSetup method for modloading
+        BLOCKS.register(modEventBus) // Register the Deferred Register to the mod event bus so blocks get registered
+        ITEMS.register(modEventBus) // Register the Deferred Register to the mod event bus so items get registered
+        BLOCK_ENTITY_TYPES.register(modEventBus)
+        CREATIVE_MODE_TABS.register(modEventBus) // Register the Deferred Register to the mod event bus so tabs get registered
+        // Register ourselves for server and other game events we are interested in.
+        // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
+        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this)
-        modEventBus.addListener(::addCreative)
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC)
+        modEventBus.addListener(::addCreative) // Register the item to a creative tab
+        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC) // Register our mod's ModConfigSpec so that FML can create and load the config file for us
+        TechnicalManager.instance = TechnicalManager()
+
     }
 
     private fun commonSetup(event: FMLCommonSetupEvent) {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP")
-
-        if (Config.logDirtBlock) LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT))
-
-        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber)
-
-        Config.items.forEach(Consumer { item: Item ->
-            LOGGER.info(
-                "ITEM >> {}",
-                item.toString()
-            )
-        })
     }
 
     // Add the example block item to the building blocks tab
