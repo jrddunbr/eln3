@@ -14,7 +14,6 @@ class NbtBatterySlowProcess(
     private var explosionRadius = 2f
 
     override fun destroy() {
-        // TODO: Enable self destruct?!
-        //node.physicalSelfDestruction(explosionRadius)
+        node.physicalSelfDestruction(explosionRadius)
     }
 }

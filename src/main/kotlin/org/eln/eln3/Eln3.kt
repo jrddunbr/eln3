@@ -12,7 +12,6 @@ import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters
 import net.minecraft.world.item.CreativeModeTabs
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
@@ -29,8 +28,6 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
 import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent
 import net.neoforged.neoforge.event.server.ServerStartingEvent
-import net.neoforged.neoforge.event.tick.ServerTickEvent
-import net.neoforged.neoforge.event.tick.ServerTickEvent.Pre
 import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredItem
@@ -39,8 +36,9 @@ import org.eln.eln3.sim.MnaConst
 import org.eln.eln3.sim.Simulator
 import org.eln.eln3.single.SingleTestBlock
 import org.eln.eln3.single.SingleTestBlockEntity
+import org.eln.eln3.single.cable.CableBlock
+import org.eln.eln3.single.cable.CableBlockEntity
 import org.eln.eln3.technical.TechnicalManager
-import java.util.function.Consumer
 import java.util.function.Supplier
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -95,6 +93,19 @@ class Eln3
             ).build(null) })
 
 
+        val cableBlock: Supplier<CableBlock> = Supplier {CableBlock()}
+        val CABLE_BLOCK = BLOCKS.register("cable_block", cableBlock)
+        val CABLE_ITEM = ITEMS.registerSimpleBlockItem(CABLE_BLOCK)
+        val CBE = fun (pos: BlockPos, state: BlockState): CableBlockEntity {
+            return CableBlockEntity(CABLE_BLOCK_ENTITY.get(), pos, state)
+        }
+        val CABLE_BLOCK_ENTITY: Supplier<BlockEntityType<CableBlockEntity>> =
+            BLOCK_ENTITY_TYPES.register("cable_block_entity", Supplier { BlockEntityType.Builder.of(
+                CBE,
+                CABLE_BLOCK.get()
+            ).build(null) })
+
+
 
         // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
         val ELN3_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = CREATIVE_MODE_TABS.register(
@@ -107,6 +118,7 @@ class Eln3
                     .displayItems { parameters: ItemDisplayParameters?, output: CreativeModeTab.Output ->
                         output.accept(TEST_ITEM.get()) // Add the example item to the tab. For your own tabs, this method is preferred over the event
                         output.accept(SIMPLE_TEST_BLOCK_ITEM.get())
+                        output.accept(CABLE_ITEM.get())
                     }.build()
             })
 
@@ -135,7 +147,7 @@ class Eln3
         modEventBus.addListener(::addCreative) // Register the item to a creative tab
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC) // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         TechnicalManager.instance = TechnicalManager()
-
+        NeoForge.EVENT_BUS.register(simulator)
     }
 
     private fun commonSetup(event: FMLCommonSetupEvent) {

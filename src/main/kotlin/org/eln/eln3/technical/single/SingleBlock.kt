@@ -1,4 +1,4 @@
-package org.eln.eln3.single
+package org.eln.eln3.technical.single
 
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.player.Player
@@ -9,11 +9,12 @@ import net.minecraft.world.level.block.EntityBlock
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.MapColor
 import org.eln.eln3.Eln3
 import org.eln.eln3.technical.ITechnicalBlock
-import org.eln.eln3.technical.single.SingleTechnical
 
-class SingleTestBlock(properties: Properties) : Block(properties), EntityBlock, ITechnicalBlock {
+open class SingleBlock() :
+    Block(Properties.of().mapColor(MapColor.STONE)), EntityBlock, ITechnicalBlock {
 
     override fun onPlace(
         pState: BlockState,
@@ -55,7 +56,7 @@ class SingleTestBlock(properties: Properties) : Block(properties), EntityBlock, 
     }
 
     override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity? {
-        return SingleTestBlockEntity(Eln3.SIMPLE_BLOCK_ENTITY.get(), pPos, pState)
+        return SingleBlockEntity(Eln3.CABLE_BLOCK_ENTITY.get(), pPos, pState)
     }
 
     override fun getTechnical(): Class<*> {

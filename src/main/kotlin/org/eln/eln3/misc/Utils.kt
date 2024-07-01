@@ -1,7 +1,6 @@
 package org.eln.eln3.misc
 
 import org.lwjgl.opengl.GL11
-import java.io.IOException
 import java.lang.SecurityException
 import java.lang.IllegalAccessException
 import java.lang.NoSuchFieldException
@@ -21,8 +20,6 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks
 import org.eln.eln3.Config
 import org.eln.eln3.Eln3
 import org.eln.eln3.sim.PhysicalConstant
-import java.io.DataInputStream
-import java.io.DataOutputStream
 import java.lang.IllegalArgumentException
 import java.text.DecimalFormat
 import java.util.*
@@ -31,19 +28,9 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 object Utils {
-    val d = arrayOfNulls<Any>(5)
     const val minecraftDay = (60 * 24).toDouble()
     val random = Random()
     const val burnTimeToEnergyFactor = 1.0
-    const val voltageMageFactor = 0.1
-
-    @JvmStatic
-    var uuid = 1
-        get() {
-            if (field < 1) field = 1
-            return field++
-        }
-        private set
 
     @JvmStatic
     fun rand(min: Double, max: Double): Double {
@@ -57,12 +44,12 @@ object Utils {
 
     @JvmStatic
     fun println(str: Any?) {
-        if (str != null) println(str.toString())
+        if (str != null) Eln3.LOGGER.info(str.toString())
     }
 
     @JvmStatic
     fun println(format: String?, vararg data: Any?) {
-        println(String.format(format!!, *data))
+        Eln3.LOGGER.info(String.format(format!!, *data))
     }
 
     @JvmStatic
@@ -119,7 +106,7 @@ object Utils {
         return if (dirx == 1) Direction.XN else Direction.ZN
     }*/
 
-    fun getItemEnergie(par0ItemStack: ItemStack?): Double {
+    fun getItemEnergy(par0ItemStack: ItemStack?): Double {
         return burnTimeToEnergyFactor * 80000.0 / 1600 * (par0ItemStack as IItemStackExtension).getBurnTime(RecipeType.SMELTING)
     }
 

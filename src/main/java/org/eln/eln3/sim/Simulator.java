@@ -3,6 +3,7 @@ package org.eln.eln3.sim;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import org.eln.eln3.Eln3;
 import org.eln.eln3.misc.Utils;
 import org.eln.eln3.sim.mna.RootSystem;
 import org.eln.eln3.sim.mna.component.Component;

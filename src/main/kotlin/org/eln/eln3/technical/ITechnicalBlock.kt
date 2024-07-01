@@ -10,6 +10,8 @@ import net.minecraft.world.level.material.FluidState
 
 interface ITechnicalBlock {
 
+    fun getTechnical(): Class<*>
+
     fun onPlaceTech(
         block: Block,
         pState: BlockState,

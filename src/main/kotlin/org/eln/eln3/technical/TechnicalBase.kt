@@ -17,7 +17,7 @@ import java.util.ArrayList
 import kotlin.experimental.or
 
 
-class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state: BlockState, var entity: ITechnicalEntity?, var pos: BlockPos, var level: Level) {
+open class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state: BlockState, var entity: ITechnicalEntity?, var pos: BlockPos, var level: Level) {
     var neighborOpaque: Byte = 0
     var neighborWrapable: Byte = 0
     var nodeConnectionList = ArrayList<TechnicalConnection>(4)
@@ -176,9 +176,9 @@ class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state: Blo
         connect()
     }
 
-    fun getSideConnectionMask(side: Direction, lrdu: LRDU): Int = 0
-    fun getThermalLoad(side: Direction, lrdu: LRDU, mask: Int): ThermalLoad? = null
-    fun getElectricalLoad(side: Direction, lrdu: LRDU, mask: Int): ElectricalLoad? = null
+    open fun getSideConnectionMask(side: Direction, lrdu: LRDU): Int = 0
+    open fun getThermalLoad(side: Direction, lrdu: LRDU, mask: Int): ThermalLoad? = null
+    open fun getElectricalLoad(side: Direction, lrdu: LRDU, mask: Int): ElectricalLoad? = null
     open fun checkCanStay(onCreate: Boolean) {}
 
     open fun connectJob() {
@@ -212,6 +212,7 @@ class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state: Blo
         }*/
         for (dir in Direction.entries) {
             val otherNode = getNeighbor(dir).firstOrNull()
+            Eln3.LOGGER.info("Trying to connect $pos to ${otherNode?.pos}")
             if (otherNode != null && otherNode.isAdded) {
                 for (lrdu in LRDU.entries) {
                     tryConnectTwoNode(this, dir, lrdu, otherNode, dir.inverse, lrdu.inverseIfLR())
@@ -443,9 +444,12 @@ class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state: Blo
         //var beepError = SoundCommand("eln:beep_error").smallRange()!!
 
         fun tryConnectTwoNode(nodeA: TechnicalBase, directionA: Direction, lrduA: LRDU, nodeB: TechnicalBase, directionB: Direction, lrduB: LRDU) {
+            Eln3.LOGGER.info("Trying to connect two nodes: $nodeA, $nodeB")
             val mskA = nodeA.getSideConnectionMask(directionA, lrduA)
             val mskB = nodeB.getSideConnectionMask(directionB, lrduB)
+            Eln3.LOGGER.info("mskA: $mskA, mskB: $mskB")
             if (compareConnectionMask(mskA, mskB)) {
+                Eln3.LOGGER.info("Connection masks match, trying connections")
                 val eCon: ElectricalConnection?
                 val tCon: ThermalConnection?
                 val nodeConnection = TechnicalConnection(nodeA, directionA, lrduA, nodeB, directionB, lrduB)
