@@ -32,10 +32,10 @@ import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
+import org.eln.eln3.compat.TopCompat
 import org.eln.eln3.sim.MnaConst
 import org.eln.eln3.sim.Simulator
-import org.eln.eln3.single.SingleTestBlock
-import org.eln.eln3.single.SingleTestBlockEntity
+import org.eln.eln3.single.*
 import org.eln.eln3.single.cable.CableBlock
 import org.eln.eln3.single.cable.CableBlockEntity
 import org.eln.eln3.technical.TechnicalManager
@@ -106,6 +106,31 @@ class Eln3
             ).build(null) })
 
 
+        val voltageSourceBlock: Supplier<VoltageSourceBlock> = Supplier { VoltageSourceBlock() }
+        val VS_BLOCK = BLOCKS.register("voltage_source_block", voltageSourceBlock)
+        val VS_ITEM = ITEMS.registerSimpleBlockItem(VS_BLOCK)
+        val VS_BE = fun (pos: BlockPos, state: BlockState): VoltageSourceBlockEntity {
+            return VoltageSourceBlockEntity(VS_SBE.get(), pos, state)
+        }
+        val VS_SBE: Supplier<BlockEntityType<VoltageSourceBlockEntity>> =
+            BLOCK_ENTITY_TYPES.register("voltage_source_entity", Supplier { BlockEntityType.Builder.of(
+                VS_BE,
+                VS_BLOCK.get()
+            ).build(null) })
+
+        val groundBlock: Supplier<GroundBlock> = Supplier { GroundBlock() }
+        val GROUND_BLOCK = BLOCKS.register("ground_block", groundBlock)
+        val GROUND_ITEM = ITEMS.registerSimpleBlockItem(GROUND_BLOCK)
+        val GROUND_BE = fun (pos: BlockPos, state: BlockState): GroundBlockEntity {
+            return GroundBlockEntity(GROUND_SBE.get(), pos, state)
+        }
+        val GROUND_SBE: Supplier<BlockEntityType<GroundBlockEntity>> =
+            BLOCK_ENTITY_TYPES.register("ground_entity", Supplier { BlockEntityType.Builder.of(
+                GROUND_BE,
+                GROUND_BLOCK.get()
+            ).build(null) })
+
+
 
         // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
         val ELN3_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = CREATIVE_MODE_TABS.register(
@@ -119,6 +144,8 @@ class Eln3
                         output.accept(TEST_ITEM.get()) // Add the example item to the tab. For your own tabs, this method is preferred over the event
                         output.accept(SIMPLE_TEST_BLOCK_ITEM.get())
                         output.accept(CABLE_ITEM.get())
+                        output.accept(VS_ITEM.get())
+                        output.accept(GROUND_ITEM.get())
                     }.build()
             })
 
@@ -153,6 +180,7 @@ class Eln3
     private fun commonSetup(event: FMLCommonSetupEvent) {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP")
+        TopCompat.register()
     }
 
     // Add the example block item to the building blocks tab

@@ -1,4 +1,4 @@
-package org.eln.eln3.single.cable
+package org.eln.eln3.single
 
 import mcjty.theoneprobe.api.IProbeHitData
 import mcjty.theoneprobe.api.IProbeInfo
@@ -8,11 +8,11 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
-import org.eln.eln3.Eln3
 import org.eln.eln3.misc.Utils
 import org.eln.eln3.position.Direction
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.sim.ElectricalLoad
+import org.eln.eln3.sim.mna.component.VoltageSource
 import org.eln.eln3.sim.nbt.NbtElectricalLoad
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.ITechnicalEntity
@@ -20,23 +20,31 @@ import org.eln.eln3.technical.single.SingleBlock
 import org.eln.eln3.technical.single.SingleBlockEntity
 import org.eln.eln3.technical.single.SingleTechnical
 
-class CableBlock: SingleBlock() {
+class VoltageSourceBlock: SingleBlock() {
     override fun getTechnical(): Class<*> {
-        return CableTechnical::class.java
+        return VoltageSourceTechnical::class.java
     }
 }
 
-class CableBlockEntity(pType: BlockEntityType<*>, pPos: BlockPos, pBlockState: BlockState) :
+class VoltageSourceBlockEntity(pType: BlockEntityType<*>, pPos: BlockPos, pBlockState: BlockState) :
     SingleBlockEntity(pType, pPos, pBlockState) {}
 
-class CableTechnical(uuid: String, block: ITechnicalBlock, state: BlockState, entity: ITechnicalEntity?, pos: BlockPos, level: Level):
-    SingleTechnical(uuid, block, state, entity, pos, level) {
+class VoltageSourceTechnical(
+    uuid: String,
+    block: ITechnicalBlock,
+    state: BlockState,
+    entity: ITechnicalEntity?,
+    pos: BlockPos,
+    level: Level
+) : SingleTechnical(uuid, block, state, entity, pos, level) {
 
-    var electricalLoad = NbtElectricalLoad("electricalLoad")
-
+    val voltageSource = VoltageSource("source")
+    val electricalLoad = NbtElectricalLoad("load")
 
     init {
-        electricalLoad.setCanBeSimplifiedByLine(true)
+        voltageSource.setVoltage(10.0)
+        voltageSource.connectTo(electricalLoad, null)
+        electricalComponentList.add(voltageSource)
         electricalLoadList.add(electricalLoad)
     }
 
@@ -45,7 +53,6 @@ class CableTechnical(uuid: String, block: ITechnicalBlock, state: BlockState, en
     }
 
     override fun getSideConnectionMask(side: Direction, lrdu: LRDU): Int {
-        Eln3.LOGGER.info("Connection mask: ${Companion.maskElectricalAll}")
         return Companion.maskElectricalAll
     }
 

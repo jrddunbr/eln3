@@ -1,8 +1,12 @@
 package org.eln.eln3.technical
 
 
+import mcjty.theoneprobe.api.IProbeHitData
+import mcjty.theoneprobe.api.IProbeInfo
+import mcjty.theoneprobe.api.ProbeMode
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
@@ -180,6 +184,15 @@ open class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state
     open fun getThermalLoad(side: Direction, lrdu: LRDU, mask: Int): ThermalLoad? = null
     open fun getElectricalLoad(side: Direction, lrdu: LRDU, mask: Int): ElectricalLoad? = null
     open fun checkCanStay(onCreate: Boolean) {}
+
+    open fun addProbeInfo(
+        mode: ProbeMode?,
+        probeInfo: IProbeInfo,
+        player: Player?,
+        world: Level?,
+        blockState: BlockState,
+        data: IProbeHitData
+    ) {}
 
     open fun connectJob() {
         // EXTERNAL OTHERS SIXNODE
