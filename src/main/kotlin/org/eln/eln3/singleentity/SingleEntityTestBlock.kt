@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.FluidState
 import org.eln.eln3.Eln3
+import org.eln.eln3.registry.ElnBlockEntities.SIMPLE_BLOCK_ENTITY
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
@@ -58,7 +59,7 @@ class SingleEntityTestBlock(properties: Properties) : Block(properties), EntityB
     }
 
     override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity? {
-        return SingleEntityTestBlockEntity(Eln3.SIMPLE_BLOCK_ENTITY.get(), pPos, pState)
+        return SingleEntityTestBlockEntity(SIMPLE_BLOCK_ENTITY.get(), pPos, pState)
     }
 
     override fun newTechnical(
