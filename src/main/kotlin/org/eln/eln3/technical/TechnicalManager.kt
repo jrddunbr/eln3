@@ -10,7 +10,6 @@ import net.minecraft.world.level.saveddata.SavedData
 import net.neoforged.neoforge.server.ServerLifecycleHooks
 import org.eln.eln3.Eln3
 import java.util.*
-import kotlin.reflect.full.isSubclassOf
 
 
 class TechnicalManager {
@@ -20,11 +19,13 @@ class TechnicalManager {
 
     fun addTechnical(block: Block, state: BlockState, entity: BlockEntity?, pos: BlockPos, level: Level) {
         try {
-            val uuid = UUID.randomUUID().toString()
-            val clazz = (block as ITechnicalBlock).getTechnical()
-            if (!clazz.kotlin.isSubclassOf(TechnicalBase::class)) throw RuntimeException("Class $clazz must extend TechnicalBase")
-            // The way we find the constructor here is a HACK - TODO fix this to actually find the right constructor
-            val tb = clazz.constructors.first().newInstance(uuid, block as ITechnicalBlock, state, entity as ITechnicalEntity?, pos, level) as TechnicalBase
+            Eln3.LOGGER.info(block.toString())
+            var ite: ITechnicalEntity? = null
+            // Not all Eln3 blocks are block entities. In fact, currently, none are. Lol.
+            if (entity != null && entity is ITechnicalEntity) {
+                ite = entity
+            }
+            val tb = (block as ITechnicalBlock).newTechnical(state, pos, level, ite)
             if (previousLoadStorage.containsKey(Pair(level, pos))) {
                 val tag = previousLoadStorage[Pair(level, pos)]
                 if (tag != null) {
@@ -32,7 +33,7 @@ class TechnicalManager {
                     tb.readFromNBT(tag)
                 }
             }
-            technicalData[uuid] = tb
+            technicalData[tb.uuid] = tb
             tb.connect()
             Eln3.LOGGER.info("Added technical at $level $pos")
         } catch (e: Exception) {

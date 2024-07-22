@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL11
 /**
  * Represents the 6 possible directions along the axis of a block.
  */
+@Deprecated("Consider using Direction from Minecraft core")
 enum class Direction(var int: Int) {
     /**
      * -X

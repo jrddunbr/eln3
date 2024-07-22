@@ -6,7 +6,6 @@ import mcjty.theoneprobe.api.ProbeMode
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import org.eln.eln3.misc.Utils
 import org.eln.eln3.position.Direction
@@ -17,28 +16,28 @@ import org.eln.eln3.sim.mna.component.VoltageSource
 import org.eln.eln3.sim.nbt.NbtElectricalLoad
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.ITechnicalEntity
+import org.eln.eln3.technical.TechnicalBase
 import org.eln.eln3.technical.single.SingleBlock
-import org.eln.eln3.technical.single.SingleBlockEntity
 import org.eln.eln3.technical.single.SingleTechnical
 
 
 class GroundBlock: SingleBlock() {
-    override fun getTechnical(): Class<*> {
-        return GroundTechnical::class.java
+    override fun newTechnical(
+        state: BlockState,
+        blockPos: BlockPos,
+        level: Level,
+        entity: ITechnicalEntity?
+    ): TechnicalBase {
+        return GroundTechnical(this, state, blockPos, level)
     }
 }
 
-class GroundBlockEntity(pType: BlockEntityType<*>, pPos: BlockPos, pBlockState: BlockState) :
-    SingleBlockEntity(pType, pPos, pBlockState) {}
-
 class GroundTechnical(
-    uuid: String,
     block: ITechnicalBlock,
     state: BlockState,
-    entity: ITechnicalEntity?,
     pos: BlockPos,
     level: Level
-) : SingleTechnical(uuid, block, state, entity, pos, level) {
+) : SingleTechnical(block, state, pos, level) {
 
     val voltageSource = VoltageSource("ground")
     val electricalLoad = NbtElectricalLoad("load")

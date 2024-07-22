@@ -1,4 +1,4 @@
-package org.eln.eln3.technical.single
+package org.eln.eln3.technical.singleentity
 
 import net.minecraft.core.BlockPos
 import net.minecraft.world.InteractionHand
@@ -9,6 +9,8 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.EntityBlock
+import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.level.material.MapColor
@@ -16,10 +18,10 @@ import net.minecraft.world.phys.BlockHitResult
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
-import org.eln.eln3.technical.TechnicalManager
+import org.eln.eln3.technical.single.SingleTechnical
 
-open class SingleBlock() :
-    Block(Properties.of().mapColor(MapColor.STONE)), ITechnicalBlock {
+open class SingleEntityBlock() :
+    Block(Properties.of().mapColor(MapColor.STONE)), EntityBlock, ITechnicalBlock {
 
     override fun onPlace(
         pState: BlockState,
@@ -32,11 +34,9 @@ open class SingleBlock() :
         if (pLevel.isClientSide) {
             return
         }
-        /*
-        val block = pLevel.getBlockState(pPos).block
-        if (block is SingleBlock) {
-            block.getTechnical()
-        }*/
+
+        (pLevel.getBlockEntity(pPos) as SingleEntityBlockEntity).getTechnicalReference()
+
         onPlaceTech( this, pState, pLevel, pPos, pOldState, pMovedByPiston)
     }
 
@@ -77,6 +77,10 @@ open class SingleBlock() :
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid)
     }
 
+    override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity? {
+        return TODO("This needs to know which entity.") //SingleEntityBlockEntity(Eln3.SI.get(), pPos, pState)
+    }
+
     override fun useItemOn(
         pStack: ItemStack,
         pState: BlockState,
@@ -105,7 +109,12 @@ open class SingleBlock() :
         return super.useWithoutItem(pState, pLevel, pPos, pPlayer, pHitResult)
     }
 
-    override fun newTechnical(state: BlockState, blockPos: BlockPos, level: Level, entity: ITechnicalEntity?): TechnicalBase {
-        return SingleTechnical(this, state, blockPos, level)
+    override fun newTechnical(
+        state: BlockState,
+        blockPos: BlockPos,
+        level: Level,
+        entity: ITechnicalEntity?
+    ): TechnicalBase {
+        return SingleEntityTechnical(this, state, entity, blockPos, level)
     }
 }

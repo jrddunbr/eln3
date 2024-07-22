@@ -1,4 +1,4 @@
-package org.eln.eln3.technical.single
+package org.eln.eln3.technical.singleentity
 
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockState
 import org.eln.eln3.technical.TechnicalBase
 import org.eln.eln3.technical.TechnicalManager
 
-open class SingleBlockEntity(pType: BlockEntityType<*>, val pPos: BlockPos, pBlockState: BlockState) :
+open class SingleEntityBlockEntity(pType: BlockEntityType<*>, val pPos: BlockPos, pBlockState: BlockState) :
     BlockEntity(pType, pPos, pBlockState) {
 
         fun getTechnicalReference(): TechnicalBase? {

@@ -10,6 +10,7 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 
+@Deprecated("Consider using BlockPos or GlobalPos")
 class Coordinate {
     @JvmField
     var x = 0

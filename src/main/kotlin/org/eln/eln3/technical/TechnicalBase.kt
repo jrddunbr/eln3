@@ -17,11 +17,16 @@ import org.eln.eln3.position.LRDU
 import org.eln.eln3.position.LRDUCubeMask
 import org.eln.eln3.sim.*
 import java.io.DataOutputStream
-import java.util.ArrayList
+import java.util.*
 import kotlin.experimental.or
 
-
-open class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state: BlockState, var entity: ITechnicalEntity?, var pos: BlockPos, var level: Level) {
+/**
+ * This handles any server-side technical blocks, as well as the state storage for them.
+ *
+ * NO CLIENT CALLS IN THIS CLASS
+ */
+open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var entity: ITechnicalEntity?, var pos: BlockPos, var level: Level) {
+    val uuid = UUID.randomUUID().toString()
     var neighborOpaque: Byte = 0
     var neighborWrapable: Byte = 0
     var nodeConnectionList = ArrayList<TechnicalConnection>(4)
@@ -47,13 +52,13 @@ open class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state
         neighborOpaque = 0
         neighborWrapable = 0
         for (direction in Direction.values()) {
-            vector[0] = pos.x
-            vector[1] = pos.y
-            vector[2] = pos.z
+            vector[0] = pos!!.x
+            vector[1] = pos!!.y
+            vector[2] = pos!!.z
             direction.applyTo(vector, 1)
-            val b = level.getBlockState(BlockPos(vector[0], vector[1], vector[2])).block
+            val b = level!!.getBlockState(BlockPos(vector[0], vector[1], vector[2])).block
             neighborOpaque = neighborOpaque or (1 shl direction.int).toByte()
-            if (Companion.isBlockWrappable(level, pos)) neighborWrapable = neighborWrapable or (1 shl direction.int).toByte()
+            if (Companion.isBlockWrappable(level, pos!!)) neighborWrapable = neighborWrapable or (1 shl direction.int).toByte()
         }
     }
 
@@ -84,10 +89,10 @@ open class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state
         isDestructing = true
         if (!Config.explosions) explosionStrength = 0f
         disconnect()
-        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3)
+        level!!.setBlock(pos, Blocks.AIR.defaultBlockState(), 3)
         TechnicalManager.instance!!.removeTechnical(this.uuid)
         if (explosionStrength != 0f) {
-            level.explode(null, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, explosionStrength, Level.ExplosionInteraction.BLOCK)
+            level!!.explode(null, pos!!.x + 0.5, pos!!.y + 0.5, pos!!.z + 0.5, explosionStrength, Level.ExplosionInteraction.BLOCK)
         }
     }
 
@@ -104,12 +109,12 @@ open class TechnicalBase(val uuid: String, var block: ITechnicalBlock, var state
 
     fun getNeighbor(direction: Direction): List<TechnicalBase> {
         val position = IntArray(3)
-        position[0] = pos.x
-        position[1] = pos.y
-        position[2] = pos.z
+        position[0] = pos!!.x
+        position[1] = pos!!.y
+        position[2] = pos!!.z
         direction.applyTo(position, 1)
         val testPos = BlockPos(position[0], position[1], position[2])
-        return TechnicalManager.instance!!.getTechnicalsFromLocation(testPos, level).values.toList()
+        return TechnicalManager.instance!!.getTechnicalsFromLocation(testPos, level!!).values.toList()
     }
 
     /*

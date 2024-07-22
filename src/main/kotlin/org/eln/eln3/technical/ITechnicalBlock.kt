@@ -10,7 +10,11 @@ import net.minecraft.world.level.material.FluidState
 
 interface ITechnicalBlock {
 
-    fun getTechnical(): Class<*>
+    fun newTechnical(state: BlockState, blockPos: BlockPos, level: Level, entity: ITechnicalEntity?): TechnicalBase
+
+    fun getTechnical(blockPos: BlockPos, level: Level): TechnicalBase? {
+        return TechnicalManager.instance?.getTechnicalsFromLocation(blockPos, level)?.values?.firstOrNull()
+    }
 
     fun onPlaceTech(
         block: Block,

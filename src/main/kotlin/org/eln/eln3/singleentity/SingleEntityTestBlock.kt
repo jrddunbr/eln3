@@ -1,4 +1,4 @@
-package org.eln.eln3.single
+package org.eln.eln3.singleentity
 
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.player.Player
@@ -11,9 +11,12 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.FluidState
 import org.eln.eln3.Eln3
 import org.eln.eln3.technical.ITechnicalBlock
+import org.eln.eln3.technical.ITechnicalEntity
+import org.eln.eln3.technical.TechnicalBase
 import org.eln.eln3.technical.single.SingleTechnical
+import org.eln.eln3.technical.singleentity.SingleEntityTechnical
 
-class SingleTestBlock(properties: Properties) : Block(properties), EntityBlock, ITechnicalBlock {
+class SingleEntityTestBlock(properties: Properties) : Block(properties), EntityBlock, ITechnicalBlock {
 
     override fun onPlace(
         pState: BlockState,
@@ -55,10 +58,15 @@ class SingleTestBlock(properties: Properties) : Block(properties), EntityBlock, 
     }
 
     override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity? {
-        return SingleTestBlockEntity(Eln3.SIMPLE_BLOCK_ENTITY.get(), pPos, pState)
+        return SingleEntityTestBlockEntity(Eln3.SIMPLE_BLOCK_ENTITY.get(), pPos, pState)
     }
 
-    override fun getTechnical(): Class<*> {
-        return SingleTechnical::class.java
+    override fun newTechnical(
+        state: BlockState,
+        blockPos: BlockPos,
+        level: Level,
+        entity: ITechnicalEntity?
+    ): TechnicalBase {
+        return SingleEntityTechnical(this, state, entity, blockPos, level)
     }
 }

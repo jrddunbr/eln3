@@ -36,8 +36,9 @@ import org.eln.eln3.compat.TopCompat
 import org.eln.eln3.sim.MnaConst
 import org.eln.eln3.sim.Simulator
 import org.eln.eln3.single.*
-import org.eln.eln3.single.cable.CableBlock
-import org.eln.eln3.single.cable.CableBlockEntity
+import org.eln.eln3.single.CableBlock
+import org.eln.eln3.singleentity.SingleEntityTestBlock
+import org.eln.eln3.singleentity.SingleEntityTestBlockEntity
 import org.eln.eln3.technical.TechnicalManager
 import java.util.function.Supplier
 
@@ -76,61 +77,32 @@ class Eln3
 
         val TEST_ITEM: DeferredItem<Item> = ITEMS.registerSimpleItem("test_item")
 
-        val stbs: Supplier<SingleTestBlock> = Supplier {SingleTestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE))}
+        val stbs: Supplier<SingleEntityTestBlock> = Supplier { SingleEntityTestBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE)) }
         val SIMPLE_TEST_BLOCK = BLOCKS.register("simple_test_block", stbs)
 
         val SIMPLE_TEST_BLOCK_ITEM = ITEMS.registerSimpleBlockItem(SIMPLE_TEST_BLOCK)
 
-        val cool = fun (pos: BlockPos, state: BlockState): SingleTestBlockEntity {
-            return SingleTestBlockEntity(SIMPLE_BLOCK_ENTITY.get(), pos, state)
+        val singleEntityBlockEntityProvider = fun (pos: BlockPos, state: BlockState): SingleEntityTestBlockEntity {
+            return SingleEntityTestBlockEntity(SIMPLE_BLOCK_ENTITY.get(), pos, state)
         }
 
-        //val cool: (pos: BlockPos, state: BlockState) -> SingleTestBlockEntity = {(pos, state) -> SingleTestBlockEntity(SIMPLE_BLOCK_ENTITY.get(), pos, state)}
-        val SIMPLE_BLOCK_ENTITY: Supplier<BlockEntityType<SingleTestBlockEntity>> =
+        val SIMPLE_BLOCK_ENTITY: Supplier<BlockEntityType<SingleEntityTestBlockEntity>> =
             BLOCK_ENTITY_TYPES.register("simple_block_entity", Supplier { BlockEntityType.Builder.of(
-                cool,
+                singleEntityBlockEntityProvider,
                 SIMPLE_TEST_BLOCK.get()
             ).build(null) })
 
-
-        val cableBlock: Supplier<CableBlock> = Supplier {CableBlock()}
+        val cableBlock: Supplier<CableBlock> = Supplier { CableBlock() }
         val CABLE_BLOCK = BLOCKS.register("cable_block", cableBlock)
         val CABLE_ITEM = ITEMS.registerSimpleBlockItem(CABLE_BLOCK)
-        val CBE = fun (pos: BlockPos, state: BlockState): CableBlockEntity {
-            return CableBlockEntity(CABLE_BLOCK_ENTITY.get(), pos, state)
-        }
-        val CABLE_BLOCK_ENTITY: Supplier<BlockEntityType<CableBlockEntity>> =
-            BLOCK_ENTITY_TYPES.register("cable_block_entity", Supplier { BlockEntityType.Builder.of(
-                CBE,
-                CABLE_BLOCK.get()
-            ).build(null) })
-
 
         val voltageSourceBlock: Supplier<VoltageSourceBlock> = Supplier { VoltageSourceBlock() }
         val VS_BLOCK = BLOCKS.register("voltage_source_block", voltageSourceBlock)
         val VS_ITEM = ITEMS.registerSimpleBlockItem(VS_BLOCK)
-        val VS_BE = fun (pos: BlockPos, state: BlockState): VoltageSourceBlockEntity {
-            return VoltageSourceBlockEntity(VS_SBE.get(), pos, state)
-        }
-        val VS_SBE: Supplier<BlockEntityType<VoltageSourceBlockEntity>> =
-            BLOCK_ENTITY_TYPES.register("voltage_source_entity", Supplier { BlockEntityType.Builder.of(
-                VS_BE,
-                VS_BLOCK.get()
-            ).build(null) })
 
         val groundBlock: Supplier<GroundBlock> = Supplier { GroundBlock() }
         val GROUND_BLOCK = BLOCKS.register("ground_block", groundBlock)
         val GROUND_ITEM = ITEMS.registerSimpleBlockItem(GROUND_BLOCK)
-        val GROUND_BE = fun (pos: BlockPos, state: BlockState): GroundBlockEntity {
-            return GroundBlockEntity(GROUND_SBE.get(), pos, state)
-        }
-        val GROUND_SBE: Supplier<BlockEntityType<GroundBlockEntity>> =
-            BLOCK_ENTITY_TYPES.register("ground_entity", Supplier { BlockEntityType.Builder.of(
-                GROUND_BE,
-                GROUND_BLOCK.get()
-            ).build(null) })
-
-
 
         // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
         val ELN3_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = CREATIVE_MODE_TABS.register(

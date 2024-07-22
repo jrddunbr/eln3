@@ -1,4 +1,4 @@
-package org.eln.eln3.technical.single
+package org.eln.eln3.technical.singleentity
 
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
@@ -12,9 +12,10 @@ import org.eln.eln3.sim.mna.state.State
 import org.eln.eln3.sim.nbt.NbtThermalLoad
 import org.eln.eln3.sim.nbt.TagSerializable
 import org.eln.eln3.technical.ITechnicalBlock
+import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
 
-open class SingleTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, level: Level): TechnicalBase(block, state, null, pos, level), TagSerializable {
+open class SingleEntityTechnical(block: ITechnicalBlock, state: BlockState, entity: ITechnicalEntity?, pos: BlockPos, level: Level): TechnicalBase(block, state, entity, pos, level), TagSerializable {
 
     var slowProcessList = ArrayList<IProcess>(4)
     var electricalProcessList = ArrayList<IProcess>(4)
