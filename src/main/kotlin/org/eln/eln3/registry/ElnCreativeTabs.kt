@@ -11,6 +11,7 @@ import org.eln.eln3.registry.ElnBlockEntities.SIMPLE_TEST_BLOCK_ITEM
 import org.eln.eln3.registry.ElnBlocks.CABLE_ITEM
 import org.eln.eln3.registry.ElnBlocks.GROUND_ITEM
 import org.eln.eln3.registry.ElnBlocks.VS_ITEM
+import org.eln.eln3.registry.ElnItems.VOLTMETER_ITEM
 import java.util.function.Supplier
 
 object ElnCreativeTabs {
@@ -25,6 +26,7 @@ object ElnCreativeTabs {
                     output.accept(VS_ITEM.get())
                     output.accept(CABLE_ITEM.get())
                     output.accept(GROUND_ITEM.get())
+                    output.accept(VOLTMETER_ITEM.get())
                     output.accept(SIMPLE_TEST_BLOCK_ITEM.get())
                 }.build()
         })
