@@ -12,6 +12,7 @@ import org.eln.eln3.misc.Utils
 import org.eln.eln3.position.Direction
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.sim.ElectricalLoad
+import org.eln.eln3.sim.MnaConst
 import org.eln.eln3.sim.mna.component.VoltageSource
 import org.eln.eln3.sim.nbt.NbtElectricalLoad
 import org.eln.eln3.technical.ITechnicalBlock
@@ -45,6 +46,7 @@ class GroundTechnical(
     init {
         voltageSource.setVoltage(0.0)
         voltageSource.connectTo(electricalLoad, null)
+        electricalLoad.serialResistance = MnaConst.noImpedance
         electricalComponentList.add(voltageSource)
         electricalLoadList.add(electricalLoad)
     }

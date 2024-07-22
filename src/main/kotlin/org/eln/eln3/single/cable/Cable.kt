@@ -13,6 +13,7 @@ import org.eln.eln3.misc.Utils
 import org.eln.eln3.position.Direction
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.sim.ElectricalLoad
+import org.eln.eln3.sim.MnaConst
 import org.eln.eln3.sim.nbt.NbtElectricalLoad
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.ITechnicalEntity
@@ -37,6 +38,7 @@ class CableTechnical(uuid: String, block: ITechnicalBlock, state: BlockState, en
 
     init {
         electricalLoad.setCanBeSimplifiedByLine(true)
+        electricalLoad.serialResistance = MnaConst.cableImpedance
         electricalLoadList.add(electricalLoad)
     }
 
@@ -59,5 +61,6 @@ class CableTechnical(uuid: String, block: ITechnicalBlock, state: BlockState, en
     ) {
         probeInfo.text(Utils.plotVolt(electricalLoad.voltage))
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
+        probeInfo.text(Utils.plotOhm(electricalLoad.serialResistance))
     }
 }

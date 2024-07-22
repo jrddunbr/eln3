@@ -12,6 +12,7 @@ import org.eln.eln3.misc.Utils
 import org.eln.eln3.position.Direction
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.sim.ElectricalLoad
+import org.eln.eln3.sim.MnaConst
 import org.eln.eln3.sim.mna.component.VoltageSource
 import org.eln.eln3.sim.nbt.NbtElectricalLoad
 import org.eln.eln3.technical.ITechnicalBlock
@@ -44,6 +45,7 @@ class VoltageSourceTechnical(
     init {
         voltageSource.setVoltage(10.0)
         voltageSource.connectTo(electricalLoad, null)
+        electricalLoad.serialResistance = MnaConst.noImpedance
         electricalComponentList.add(voltageSource)
         electricalLoadList.add(electricalLoad)
     }
@@ -64,7 +66,8 @@ class VoltageSourceTechnical(
         blockState: BlockState,
         data: IProbeHitData
     ) {
-        probeInfo.text(Utils.plotVolt(electricalLoad.voltage))
+        probeInfo.text(Utils.plotVolt("Source", voltageSource.voltage))
+        probeInfo.text(Utils.plotVolt("Cable", electricalLoad.voltage))
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
     }
 }

@@ -4,6 +4,7 @@ object MnaConst {
     const val ultraImpedance: Double = 1e16
     const val highImpedance: Double = 1e9
     const val pullDown: Double = 1e9
+    const val cableImpedance: Double = 0.001 // TODO: Make this some copper resistance?
     const val noImpedance: Double = 1e-9
 
     // Voltage Levels
