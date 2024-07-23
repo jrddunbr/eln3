@@ -1,12 +1,19 @@
 package org.eln.eln3.technical
 
 import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.Component
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.phys.BlockHitResult
+import org.eln.eln3.registry.ElnItems.VOLTMETER_ITEM
 
 interface ITechnicalBlock {
 
@@ -50,5 +57,33 @@ interface ITechnicalBlock {
         fluid: FluidState
     ) {
         TechnicalManager.instance!!.removeTechnicalsFromLocation(pos, level)
+    }
+
+    fun useItemOnTech(
+        pStack: ItemStack,
+        pState: BlockState,
+        pLevel: Level,
+        pPos: BlockPos,
+        pPlayer: Player,
+        pHand: InteractionHand,
+        pHitResult: BlockHitResult
+    ): ItemInteractionResult {
+        if (pStack.item == VOLTMETER_ITEM.asItem()) {
+            val voltmeterString = TechnicalManager.instance!!.getTechnicalsFromLocation(pPos, pLevel)
+                .values.firstOrNull()?.getVoltmeterString(null)?: ""
+            pPlayer.displayClientMessage(Component.literal(voltmeterString), false)
+            return ItemInteractionResult.CONSUME
+        }
+        return ItemInteractionResult.SUCCESS
+    }
+
+    fun useWithoutItemTech(
+        pState: BlockState,
+        pLevel: Level,
+        pPos: BlockPos,
+        pPlayer: Player,
+        pHitResult: BlockHitResult
+    ): InteractionResult {
+        return InteractionResult.SUCCESS
     }
 }

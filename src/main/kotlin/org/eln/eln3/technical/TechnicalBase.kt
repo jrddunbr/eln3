@@ -300,22 +300,21 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         nbt.putByte("NBWrap", neighborWrapable)
     }
 
-    open fun multiMeterString(side: Direction): String {
+    open fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
         return ""
     }
 
-    open fun thermoMeterString(side: Direction): String {
+    open fun getThermalProbeString(side: net.minecraft.core.Direction?): String {
         return ""
     }
 
-    /*
-    open fun readConfigTool(side: Direction?, tag: CompoundTag?, invoker: EntityPlayer?): Boolean {
+    open fun readConfigTool(side: net.minecraft.core.Direction?, tag: CompoundTag?, invoker: Player?): Boolean {
         return false
     }
 
-    open fun writeConfigTool(side: Direction?, tag: CompoundTag?, invoker: EntityPlayer?): Boolean {
+    open fun writeConfigTool(side: net.minecraft.core.Direction?, tag: CompoundTag?, invoker: Player?): Boolean {
         return false
-    }*/
+    }
 
     private fun isINodeProcess(process: IProcess): Boolean {
         for (c in process.javaClass.interfaces) {

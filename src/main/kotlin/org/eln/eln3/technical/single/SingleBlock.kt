@@ -89,7 +89,7 @@ open class SingleBlock() :
         if (pLevel.isClientSide) {
             return ItemInteractionResult.SUCCESS
         }
-        return super.useItemOn(pStack, pState, pLevel, pPos, pPlayer, pHand, pHitResult)
+        return useItemOnTech(pStack, pState, pLevel, pPos, pPlayer, pHand, pHitResult)
     }
 
     override fun useWithoutItem(
@@ -102,7 +102,7 @@ open class SingleBlock() :
         if (pLevel.isClientSide) {
             return InteractionResult.SUCCESS
         }
-        return super.useWithoutItem(pState, pLevel, pPos, pPlayer, pHitResult)
+        return useWithoutItemTech(pState, pLevel, pPos, pPlayer, pHitResult)
     }
 
     override fun newTechnical(state: BlockState, blockPos: BlockPos, level: Level, entity: ITechnicalEntity?): TechnicalBase {

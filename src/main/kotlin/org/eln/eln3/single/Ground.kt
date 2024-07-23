@@ -68,4 +68,8 @@ class GroundTechnical(
     ) {
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
     }
+
+    override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
+        return Utils.plotVolt(electricalLoad.voltage)
+    }
 }

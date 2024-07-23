@@ -64,4 +64,8 @@ class CableTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, l
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
         probeInfo.text(Utils.plotOhm(electricalLoad.serialResistance))
     }
+
+    override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
+        return Utils.plotVolt(electricalLoad.voltage)
+    }
 }

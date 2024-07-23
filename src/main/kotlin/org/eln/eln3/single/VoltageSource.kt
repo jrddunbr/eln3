@@ -65,8 +65,11 @@ class VoltageSourceTechnical(
         blockState: BlockState,
         data: IProbeHitData
     ) {
-        probeInfo.text(Utils.plotVolt("Source", voltageSource.voltage))
-        probeInfo.text(Utils.plotVolt("Cable", electricalLoad.voltage))
+        probeInfo.text(Utils.plotVolt(voltageSource.voltage))
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
+    }
+
+    override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
+        return Utils.plotVolt(electricalLoad.voltage)
     }
 }
