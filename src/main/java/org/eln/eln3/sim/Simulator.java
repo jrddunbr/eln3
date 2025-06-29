@@ -417,6 +417,7 @@ public class Simulator /* ,IPacketHandler */ {
             thermalSlowNsStack /= 20;
             slowNsStack /= 20;
 
+            /*
             Utils.println("ticks " + new DecimalFormat("#").format((int) avgTickTime) + " us" + "  E " + electricalNsStack / 1000 + "  TF " + thermalFastNsStack / 1000 + "  TS " + thermalSlowNsStack / 1000 + "  S " + slowNsStack / 1000
 
                 + "    " + mna.getSubSystemCount() + " SS"
@@ -429,6 +430,7 @@ public class Simulator /* ,IPacketHandler */ {
                 + "    " + thermalSlowProcessList.size() + " TSP"
                 + "    " + slowProcessList.size() + " SP"
             );
+            */
 
             avgTickTime = 0;
 

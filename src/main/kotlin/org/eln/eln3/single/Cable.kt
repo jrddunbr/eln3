@@ -48,7 +48,7 @@ class CableTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, l
     }
 
     override fun getSideConnectionMask(side: Direction, lrdu: LRDU): Int {
-        Eln3.LOGGER.info("Connection mask: ${Companion.maskElectricalAll}")
+        //Eln3.LOGGER.info("Connection mask: ${Companion.maskElectricalAll}")
         return Companion.maskElectricalAll
     }
 

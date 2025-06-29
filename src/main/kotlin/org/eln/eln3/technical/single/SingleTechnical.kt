@@ -13,6 +13,7 @@ import org.eln.eln3.sim.nbt.NbtThermalLoad
 import org.eln.eln3.sim.nbt.TagSerializable
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.TechnicalBase
+import org.eln.eln3.technical.TechnicalManager
 
 open class SingleTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, level: Level): TechnicalBase(block, state, null, pos, level), TagSerializable {
 

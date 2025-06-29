@@ -147,7 +147,7 @@ public class SubSystem {
         matrixValid = true;
 
         p.stop();
-        Utils.println(p);
+        //Utils.println(p);
     }
 
     public void addToA(State a, State b, double v) {

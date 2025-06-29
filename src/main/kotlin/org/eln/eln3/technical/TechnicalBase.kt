@@ -34,6 +34,7 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
     private var isAdded = false
     var needPublish = false
 
+
     open fun mustBeSaved(): Boolean {
         return true
     }
@@ -90,7 +91,9 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         if (!Config.explosions) explosionStrength = 0f
         disconnect()
         level!!.setBlock(pos, Blocks.AIR.defaultBlockState(), 3)
-        TechnicalManager.instance!!.removeTechnical(this.uuid)
+
+        TechnicalManager.use(level) { t -> t.removeTechnical(uuid) }
+
         if (explosionStrength != 0f) {
             level!!.explode(null, pos!!.x + 0.5, pos!!.y + 0.5, pos!!.z + 0.5, explosionStrength, Level.ExplosionInteraction.BLOCK)
         }
@@ -114,8 +117,9 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         position[2] = pos!!.z
         direction.applyTo(position, 1)
         val testPos = BlockPos(position[0], position[1], position[2])
-        return TechnicalManager.instance!!.getTechnicalsFromLocation(testPos, level!!).values.toList()
+        return TechnicalManager.get(level)?.getTechnicalsFromLocation(testPos, level)?.values?.toList()?: listOf()
     }
+
 
     /*
     open fun onBreakBlock() {
@@ -230,7 +234,7 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         }*/
         for (dir in Direction.entries) {
             val otherNode = getNeighbor(dir).firstOrNull()
-            Eln3.LOGGER.info("Trying to connect $pos to ${otherNode?.pos}")
+            //Eln3.LOGGER.info("Trying to connect $pos to ${otherNode?.pos}")
             if (otherNode != null && otherNode.isAdded) {
                 for (lrdu in LRDU.entries) {
                     tryConnectTwoNode(this, dir, lrdu, otherNode, dir.inverse, lrdu.inverseIfLR())
@@ -417,6 +421,7 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         disconnect()
     }
 
+
     companion object {
         const val maskElectricalPower = 1 shl 0
         const val maskThermal = 1 shl 1
@@ -461,12 +466,12 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         //var beepError = SoundCommand("eln:beep_error").smallRange()!!
 
         fun tryConnectTwoNode(nodeA: TechnicalBase, directionA: Direction, lrduA: LRDU, nodeB: TechnicalBase, directionB: Direction, lrduB: LRDU) {
-            Eln3.LOGGER.info("Trying to connect two nodes: $nodeA, $nodeB")
+            //Eln3.LOGGER.info("Trying to connect two nodes: $nodeA, $nodeB")
             val mskA = nodeA.getSideConnectionMask(directionA, lrduA)
             val mskB = nodeB.getSideConnectionMask(directionB, lrduB)
-            Eln3.LOGGER.info("mskA: $mskA, mskB: $mskB")
+            //Eln3.LOGGER.info("mskA: $mskA, mskB: $mskB")
             if (compareConnectionMask(mskA, mskB)) {
-                Eln3.LOGGER.info("Connection masks match, trying connections")
+                //Eln3.LOGGER.info("Connection masks match, trying connections")
                 val eCon: ElectricalConnection?
                 val tCon: ThermalConnection?
                 val nodeConnection = TechnicalConnection(nodeA, directionA, lrduA, nodeB, directionB, lrduB)

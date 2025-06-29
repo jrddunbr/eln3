@@ -23,9 +23,12 @@ import net.neoforged.fml.config.ModConfig
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
 import net.neoforged.neoforge.common.NeoForge
+import net.neoforged.neoforge.event.level.LevelEvent
 import net.neoforged.neoforge.event.server.ServerStartingEvent
+import net.neoforged.neoforge.event.server.ServerStoppedEvent
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
+import net.neoforged.neoforge.server.ServerLifecycleHooks
 import org.eln.eln3.compat.TopCompat
 import org.eln.eln3.registry.ElnBlockEntities
 import org.eln.eln3.registry.ElnBlockEntities.SIMPLE_TEST_BLOCK_ITEM
@@ -98,7 +101,6 @@ class Eln3
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this)
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC) // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        TechnicalManager.instance = TechnicalManager()
         NeoForge.EVENT_BUS.register(simulator)
     }
 
@@ -113,5 +115,10 @@ class Eln3
     fun onServerStarting(event: ServerStartingEvent) {
         // Do something when the server starts
         LOGGER.info("HELLO from server starting")
+    }
+
+    @SubscribeEvent
+    fun onServerStopped(event: ServerStoppedEvent) {
+        LOGGER.info("HELLO from server stopping")
     }
 }

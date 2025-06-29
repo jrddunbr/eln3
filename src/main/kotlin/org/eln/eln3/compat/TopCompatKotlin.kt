@@ -22,6 +22,13 @@ object TopCompatibilityKotlin {
             return ResourceLocation.fromNamespaceAndPath(Eln3.MODID, "eln3")
         }
 
+        fun addErrorInfo(
+            probeInfo: IProbeInfo,
+            error: String
+        ) {
+            probeInfo.text(error)
+        }
+
         override fun addProbeInfo(
             mode: ProbeMode?,
             probeInfo: IProbeInfo,
@@ -33,18 +40,30 @@ object TopCompatibilityKotlin {
             when(blockState.block) {
                 is CableBlock -> {
                     val block = blockState.block as SingleBlock
-                    val technical = block.getTechnical(data.pos, world!!) as CableTechnical
-                    technical.addProbeInfo(mode, probeInfo, player, world, blockState, data)
+                    val technical = block.getTechnical(data.pos, world!!) as CableTechnical?
+                    if (technical == null) {
+                        addErrorInfo(probeInfo, "Technical is null :(")
+                    } else {
+                        technical.addProbeInfo(mode, probeInfo, player, world, blockState, data)
+                    }
                 }
                 is VoltageSourceBlock -> {
                     val block = blockState.block as SingleBlock
-                    val technical = block.getTechnical(data.pos, world!!) as VoltageSourceTechnical
-                    technical.addProbeInfo(mode, probeInfo, player, world, blockState, data)
+                    val technical = block.getTechnical(data.pos, world!!) as VoltageSourceTechnical?
+                    if (technical == null) {
+                        addErrorInfo(probeInfo, "Technical is null :(")
+                    } else {
+                        technical.addProbeInfo(mode, probeInfo, player, world, blockState, data)
+                    }
                 }
                 is GroundBlock -> {
                     val block = blockState.block as SingleBlock
-                    val technical = block.getTechnical(data.pos, world!!) as GroundTechnical
-                    technical.addProbeInfo(mode, probeInfo, player, world, blockState, data)
+                    val technical = block.getTechnical(data.pos, world!!) as GroundTechnical?
+                    if (technical == null) {
+                        addErrorInfo(probeInfo, "Technical is null :(")
+                    } else {
+                        technical.addProbeInfo(mode, probeInfo, player, world, blockState, data)
+                    }
                 }
             }
 

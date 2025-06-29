@@ -11,8 +11,7 @@ open class SingleEntityBlockEntity(pType: BlockEntityType<*>, val pPos: BlockPos
     BlockEntity(pType, pPos, pBlockState) {
 
         fun getTechnicalReference(): TechnicalBase? {
-            return TechnicalManager.instance?.getTechnicalsFromLocation(
-                pPos, level?: throw RuntimeException("Could not get level")
-            )?.values?.firstOrNull()
+            val level = level ?: throw RuntimeException("Could not get level")
+            return TechnicalManager.get(level)?.getTechnicalsFromLocation(pPos, level)?.values?.firstOrNull()
         }
 }
