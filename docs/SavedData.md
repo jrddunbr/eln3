@@ -13,7 +13,7 @@ To implement `SavedData`, you'll typically:
 * Provide a `SavedData.Factory`: This factory will be used to create instances of your `SavedData` class when needed.
 * Register the `SavedData` with a `DimensionDataStorage`: This will make your `SavedData` loadable and savable within a specific level. The Overworld is commonly used for level-agnostic data. 
 
-NeoForged docs provides an example SavedData implementation. This includes a class extending `SavedData` with methods for creating, loading, and saving data using a `CompoundTag`. It also shows how to attach the `SavedData` to a level using `DimensionDataStorage#computeIfAbsent`.
+[NeoForged docs](https://docs.neoforged.net/docs/1.20.4/datastorage/saveddata) provides an example SavedData implementation. This includes a class extending `SavedData` with methods for creating, loading, and saving data using a `CompoundTag`. It also shows how to attach the `SavedData` to a level using `DimensionDataStorage#computeIfAbsent`.
 
 ```java
 import net.minecraft.nbt.CompoundTag;
