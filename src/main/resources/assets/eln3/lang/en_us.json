@@ -1,7 +1,8 @@
 {
-  "block.eln3.voltage_source_block": "Voltage Source",
-  "block.eln3.cable_block": "Cable",
-  "block.eln3.ground_block": "Ground",
+  "block.eln3.voltage_source": "Voltage Source",
+  "block.eln3.cable": "Cable",
+  "block.eln3.ground": "Ground",
+  "block.eln3.resistor": "Resistor",
   "item.eln3.voltmeter": "Voltmeter",
   "itemGroup.eln3": "Electrical Age 3"
 }

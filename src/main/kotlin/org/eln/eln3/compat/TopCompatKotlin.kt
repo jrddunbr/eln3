@@ -12,6 +12,8 @@ import org.eln.eln3.single.VoltageSourceBlock
 import org.eln.eln3.single.VoltageSourceTechnical
 import org.eln.eln3.single.CableBlock
 import org.eln.eln3.single.CableTechnical
+import org.eln.eln3.single.ResistorBlock
+import org.eln.eln3.single.ResistorTechnical
 import org.eln.eln3.technical.single.SingleBlock
 
 object TopCompatibilityKotlin {
@@ -59,6 +61,15 @@ object TopCompatibilityKotlin {
                 is GroundBlock -> {
                     val block = blockState.block as SingleBlock
                     val technical = block.getTechnical(data.pos, world!!) as GroundTechnical?
+                    if (technical == null) {
+                        addErrorInfo(probeInfo, "Technical is null :(")
+                    } else {
+                        technical.addProbeInfo(mode, probeInfo, player, world, blockState, data)
+                    }
+                }
+                is ResistorBlock -> {
+                    val block = blockState.block as SingleBlock
+                    val technical = block.getTechnical(data.pos, world!!) as ResistorTechnical?
                     if (technical == null) {
                         addErrorInfo(probeInfo, "Technical is null :(")
                     } else {

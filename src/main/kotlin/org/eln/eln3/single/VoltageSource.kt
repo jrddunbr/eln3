@@ -54,7 +54,7 @@ class VoltageSourceTechnical(
     }
 
     override fun getSideConnectionMask(side: Direction, lrdu: LRDU): Int {
-        return Companion.maskElectricalAll
+        return maskElectricalAll
     }
 
     override fun addProbeInfo(

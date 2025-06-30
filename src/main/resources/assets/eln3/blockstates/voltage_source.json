@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "eln3:block/voltage_source"
+    }
+  }
+}

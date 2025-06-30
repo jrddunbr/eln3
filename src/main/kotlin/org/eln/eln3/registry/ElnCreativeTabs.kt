@@ -10,6 +10,7 @@ import org.eln.eln3.Eln3.Companion.MODID
 import org.eln.eln3.registry.ElnBlockEntities.SIMPLE_TEST_BLOCK_ITEM
 import org.eln.eln3.registry.ElnBlocks.CABLE_ITEM
 import org.eln.eln3.registry.ElnBlocks.GROUND_ITEM
+import org.eln.eln3.registry.ElnBlocks.RESISTOR_ITEM
 import org.eln.eln3.registry.ElnBlocks.VS_ITEM
 import org.eln.eln3.registry.ElnItems.VOLTMETER_ITEM
 import java.util.function.Supplier
@@ -21,13 +22,14 @@ object ElnCreativeTabs {
             CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup.$MODID")) //The language key for the title of your CreativeModeTab
                 .withTabsBefore(CreativeModeTabs.COMBAT)
-                .icon { CABLE_ITEM.get().defaultInstance }
+                .icon { RESISTOR_ITEM.get().defaultInstance }
                 .displayItems { parameters: ItemDisplayParameters?, output: CreativeModeTab.Output ->
                     output.accept(VS_ITEM.get())
                     output.accept(CABLE_ITEM.get())
                     output.accept(GROUND_ITEM.get())
                     output.accept(VOLTMETER_ITEM.get())
                     output.accept(SIMPLE_TEST_BLOCK_ITEM.get())
+                    output.accept(RESISTOR_ITEM.get())
                 }.build()
         })
 }

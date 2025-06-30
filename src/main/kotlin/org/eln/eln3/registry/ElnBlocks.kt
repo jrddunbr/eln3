@@ -4,6 +4,7 @@ import org.eln.eln3.Eln3.Companion.BLOCKS
 import org.eln.eln3.Eln3.Companion.ITEMS
 import org.eln.eln3.single.CableBlock
 import org.eln.eln3.single.GroundBlock
+import org.eln.eln3.single.ResistorBlock
 import org.eln.eln3.single.VoltageSourceBlock
 import java.util.function.Supplier
 
@@ -12,6 +13,7 @@ object ElnBlocks {
     val VS_BLOCK = BLOCKS.register("voltage_source", voltageSourceBlock)
     val VS_ITEM = ITEMS.registerSimpleBlockItem(VS_BLOCK)
 
+
     val cableBlock: Supplier<CableBlock> = Supplier { CableBlock() }
     val CABLE_BLOCK = BLOCKS.register("cable", cableBlock)
     val CABLE_ITEM = ITEMS.registerSimpleBlockItem(CABLE_BLOCK)
@@ -19,4 +21,8 @@ object ElnBlocks {
     val groundBlock: Supplier<GroundBlock> = Supplier { GroundBlock() }
     val GROUND_BLOCK = BLOCKS.register("ground", groundBlock)
     val GROUND_ITEM = ITEMS.registerSimpleBlockItem(GROUND_BLOCK)
+
+    val resistorBlock: Supplier<ResistorBlock> = Supplier { ResistorBlock() }
+    val RESISTOR_BLOCK = BLOCKS.register("resistor", resistorBlock)
+    val RESISTOR_ITEM = ITEMS.registerSimpleBlockItem(RESISTOR_BLOCK)
 }

@@ -1,18 +1,10 @@
 package org.eln.eln3
 
 import com.mojang.logging.LogUtils
-import net.minecraft.client.Minecraft
-import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
-import net.minecraft.network.chat.Component
 import net.minecraft.world.item.CreativeModeTab
-import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters
-import net.minecraft.world.item.CreativeModeTabs
 import net.minecraft.world.level.block.entity.BlockEntityType
-import net.minecraft.world.level.block.state.BlockBehaviour
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.material.MapColor
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.bus.api.SubscribeEvent
@@ -23,29 +15,19 @@ import net.neoforged.fml.config.ModConfig
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
 import net.neoforged.neoforge.common.NeoForge
-import net.neoforged.neoforge.event.level.LevelEvent
+import net.neoforged.neoforge.data.event.GatherDataEvent
 import net.neoforged.neoforge.event.server.ServerStartingEvent
 import net.neoforged.neoforge.event.server.ServerStoppedEvent
-import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
-import net.neoforged.neoforge.server.ServerLifecycleHooks
 import org.eln.eln3.compat.TopCompat
 import org.eln.eln3.registry.ElnBlockEntities
-import org.eln.eln3.registry.ElnBlockEntities.SIMPLE_TEST_BLOCK_ITEM
 import org.eln.eln3.registry.ElnBlocks
-import org.eln.eln3.registry.ElnBlocks.CABLE_ITEM
-import org.eln.eln3.registry.ElnBlocks.GROUND_ITEM
-import org.eln.eln3.registry.ElnBlocks.VS_ITEM
 import org.eln.eln3.registry.ElnCreativeTabs
 import org.eln.eln3.registry.ElnItems
 import org.eln.eln3.sim.MnaConst
 import org.eln.eln3.sim.Simulator
-import org.eln.eln3.single.*
-import org.eln.eln3.single.CableBlock
-import org.eln.eln3.singleentity.SingleEntityTestBlock
-import org.eln.eln3.singleentity.SingleEntityTestBlockEntity
-import org.eln.eln3.technical.TechnicalManager
-import java.util.function.Supplier
+import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
+
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Eln3.MODID)
@@ -77,8 +59,8 @@ class Eln3
             @SubscribeEvent
             fun onClientSetup(event: FMLClientSetupEvent?) {
                 // Some client setup code
-                LOGGER.info("HELLO FROM CLIENT SETUP")
-                LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().user.name)
+                //LOGGER.info("HELLO FROM CLIENT SETUP")
+                //LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().user.name)
             }
         }
     }
@@ -106,7 +88,7 @@ class Eln3
 
     private fun commonSetup(event: FMLCommonSetupEvent) {
         // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP")
+        //LOGGER.info("HELLO FROM COMMON SETUP")
         TopCompat.register()
     }
 
@@ -114,11 +96,11 @@ class Eln3
     @SubscribeEvent
     fun onServerStarting(event: ServerStartingEvent) {
         // Do something when the server starts
-        LOGGER.info("HELLO from server starting")
+        //LOGGER.info("HELLO from server starting")
     }
 
     @SubscribeEvent
     fun onServerStopped(event: ServerStoppedEvent) {
-        LOGGER.info("HELLO from server stopping")
+        //LOGGER.info("HELLO from server stopping")
     }
 }
