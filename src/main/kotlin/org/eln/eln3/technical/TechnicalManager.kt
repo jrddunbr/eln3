@@ -40,15 +40,15 @@ class TechnicalManager: SavedData() {
         if (technical != null) {
             Eln3.LOGGER.info("REMOVE: Removing technical $uuid of type ${technical.javaClass.simpleName} at ${technical.pos}")
             // Log the stack trace to see what's calling this
-            val stackTrace = Thread.currentThread().stackTrace
-            Eln3.LOGGER.info("REMOVE: Called from ${stackTrace[2].className}.${stackTrace[2].methodName}:${stackTrace[2].lineNumber}")
-            if (stackTrace.size > 3) {
-                Eln3.LOGGER.info("REMOVE: Origin ${stackTrace[3].className}.${stackTrace[3].methodName}:${stackTrace[3].lineNumber}")
-            }
+            //val stackTrace = Thread.currentThread().stackTrace
+            //Eln3.LOGGER.info("REMOVE: Called from ${stackTrace[2].className}.${stackTrace[2].methodName}:${stackTrace[2].lineNumber}")
+           // if (stackTrace.size > 3) {
+            //    Eln3.LOGGER.info("REMOVE: Origin ${stackTrace[3].className}.${stackTrace[3].methodName}:${stackTrace[3].lineNumber}")
+            //}
 
             technical.disconnect()
             technicalData.remove(uuid)
-            Eln3.LOGGER.info("REMOVE: Successfully removed technical $uuid")
+            //Eln3.LOGGER.info("REMOVE: Successfully removed technical $uuid")
         } else {
             Eln3.LOGGER.warn("REMOVE: Attempted to remove non-existent technical $uuid")
         }
@@ -56,15 +56,15 @@ class TechnicalManager: SavedData() {
 
     fun removeTechnicalsFromLocation(pos: BlockPos, level: Level) {
         val technicalsAtLocation = technicalData.filter { it.value.level == level && it.value.pos == pos }
-        Eln3.LOGGER.info("REMOVE_LOCATION: Found ${technicalsAtLocation.size} technicals at $pos in $level")
+        //Eln3.LOGGER.info("REMOVE_LOCATION: Found ${technicalsAtLocation.size} technicals at $pos in $level")
 
         technicalsAtLocation.forEach { (uuid, technical) ->
-            Eln3.LOGGER.info("REMOVE_LOCATION: Removing ${technical.javaClass.simpleName} $uuid at $pos")
+            //Eln3.LOGGER.info("REMOVE_LOCATION: Removing ${technical.javaClass.simpleName} $uuid at $pos")
             removeTechnical(uuid)
         }
 
         if (technicalsAtLocation.isEmpty()) {
-            Eln3.LOGGER.info("REMOVE_LOCATION: No technicals found at $pos to remove")
+            //Eln3.LOGGER.info("REMOVE_LOCATION: No technicals found at $pos to remove")
         }
     }
 
@@ -89,7 +89,7 @@ class TechnicalManager: SavedData() {
     fun save(nbt: CompoundTag) {
         Eln3.LOGGER.info("Saving ${technicalData.size} technicals.")
         technicalData.forEach {
-            Eln3.LOGGER.info("Saving $it")
+            //Eln3.LOGGER.info("Saving $it")
             val uuid = it.key
             val tech = it.value
             try {
@@ -114,7 +114,6 @@ class TechnicalManager: SavedData() {
     }
 
     override fun save(nbt: CompoundTag, pRegistries: HolderLookup.Provider): CompoundTag {
-        Eln3.LOGGER.info("Saving technical data.")
         save(nbt)
         return nbt
     }
@@ -128,10 +127,8 @@ class TechnicalManager: SavedData() {
         }
 
         fun load(nbt: CompoundTag, lookup: HolderLookup.Provider): TechnicalManager {
-            Eln3.LOGGER.info("Loading technical data from NBT (${nbt.allKeys.size} entries)")
-
             if (technicalData.isEmpty()) {
-                Eln3.LOGGER.debug("TechnicalManager data is empty, performing full load")
+                Eln3.LOGGER.info("Loading technical data from NBT (${nbt.allKeys.size} entries)")
             } else {
                 Eln3.LOGGER.debug("TechnicalManager already has ${technicalData.size} technicals, skipping load")
                 return create()
@@ -178,6 +175,8 @@ class TechnicalManager: SavedData() {
                     tech.readFromNBT(data)
                     tech.uuid = uuid
                     technicalData[uuid] = tech
+                    Eln3.LOGGER.info("Loaded technical $uuid at $pos in $levelName, connecting now")
+                    tech.connect()
 
                 } catch (e: Exception) {
                     Eln3.LOGGER.error("Failed to load technical from key $key", e)
@@ -210,6 +209,7 @@ class TechnicalManager: SavedData() {
                 .forEach { (uuid, tech) ->
                     validateTechnical(tech).let { valid ->
                         if (!valid) {
+                            Eln3.LOGGER.error("Chunk ${chunk.pos} has invalid technical $uuid at ${tech.pos}, removing")
                             technicalData.remove(uuid)
                         } else {
                             try {

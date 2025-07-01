@@ -213,14 +213,8 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
             probeInfo.text("UUID: ${uuid.substring(0, 8)}...")
             probeInfo.text("Connected: ${if (isAdded) "§aYes" else "§cNo"}")
             probeInfo.text("Connections: ${nodeConnectionList.size}")
-
-            // Voltage info
-            val voltageInfo = getVoltmeterString(null)
-            if (voltageInfo.isNotBlank()) {
-                probeInfo.text("§e$voltageInfo")
-            } else {
-                probeInfo.text("§cNo voltage data")
-            }
+            probeInfo.text("EC: ${nodeConnectionList.sumOf { it.EC.size }}")
+            probeInfo.text("TC: ${nodeConnectionList.sumOf { it.TC.size }}")
 
             // Simulation info
             if (mode == ProbeMode.DEBUG) {
