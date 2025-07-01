@@ -30,6 +30,14 @@ public class ElectricalLoad extends VoltageStateLineReady {
         return serialResistance;
     }
 
+    public double getBlockResistance() {
+        return serialResistance / 2;
+    }
+
+    public void setBlockResistance(double blockResistance) {
+        setSerialResistance(blockResistance * 2);
+    }
+
     public void highImpedance() {
         setSerialResistance(MnaConst.highImpedance);
     }

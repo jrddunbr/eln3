@@ -29,7 +29,7 @@ class TechnicalManager: SavedData() {
             technicalData[tb.uuid] = tb
             tb.connect()
             setDirty()
-            Eln3.LOGGER.info("Added technical at $level $pos")
+            //Eln3.LOGGER.info("Added technical at $level $pos")
         } catch (e: Exception) {
             Eln3.LOGGER.error("Failed to add technical data for $level $pos because of an exception.", e)
         }
@@ -38,7 +38,7 @@ class TechnicalManager: SavedData() {
     fun removeTechnical(uuid: String) {
         val technical = technicalData[uuid]
         if (technical != null) {
-            Eln3.LOGGER.info("REMOVE: Removing technical $uuid of type ${technical.javaClass.simpleName} at ${technical.pos}")
+            //Eln3.LOGGER.info("REMOVE: Removing technical $uuid of type ${technical.javaClass.simpleName} at ${technical.pos}")
             // Log the stack trace to see what's calling this
             //val stackTrace = Thread.currentThread().stackTrace
             //Eln3.LOGGER.info("REMOVE: Called from ${stackTrace[2].className}.${stackTrace[2].methodName}:${stackTrace[2].lineNumber}")
@@ -81,7 +81,7 @@ class TechnicalManager: SavedData() {
         val technicals = getTechnicalsFromLocation(pos, level)
         technicals.values.forEach { tech ->
             tech.state = newState
-            Eln3.LOGGER.debug("Updated block state for technical ${tech.uuid} at $pos")
+            //Eln3.LOGGER.debug("Updated block state for technical ${tech.uuid} at $pos")
         }
     }
 
@@ -122,15 +122,15 @@ class TechnicalManager: SavedData() {
         private val technicalData: HashMap<String, TechnicalBase> = HashMap()
 
         fun create(): TechnicalManager {
-            Eln3.LOGGER.info("Creating new TechnicalManager")
+            //Eln3.LOGGER.info("Creating new TechnicalManager")
             return TechnicalManager()
         }
 
         fun load(nbt: CompoundTag, lookup: HolderLookup.Provider): TechnicalManager {
             if (technicalData.isEmpty()) {
-                Eln3.LOGGER.info("Loading technical data from NBT (${nbt.allKeys.size} entries)")
+                //Eln3.LOGGER.info("Loading technical data from NBT (${nbt.allKeys.size} entries)")
             } else {
-                Eln3.LOGGER.debug("TechnicalManager already has ${technicalData.size} technicals, skipping load")
+                //Eln3.LOGGER.debug("TechnicalManager already has ${technicalData.size} technicals, skipping load")
                 return create()
             }
 
@@ -175,7 +175,7 @@ class TechnicalManager: SavedData() {
                     tech.readFromNBT(data)
                     tech.uuid = uuid
                     technicalData[uuid] = tech
-                    Eln3.LOGGER.info("Loaded technical $uuid at $pos in $levelName, connecting now")
+                    //Eln3.LOGGER.info("Loaded technical $uuid at $pos in $levelName, connecting now")
                     tech.connect()
 
                 } catch (e: Exception) {
@@ -186,7 +186,7 @@ class TechnicalManager: SavedData() {
         }
 
         fun clearData() {
-            Eln3.LOGGER.info("Clearing all technical data (${technicalData.size} technicals)")
+            //Eln3.LOGGER.info("Clearing all technical data (${technicalData.size} technicals)")
             technicalData.clear()
         }
 

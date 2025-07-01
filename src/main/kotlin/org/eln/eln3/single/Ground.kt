@@ -75,4 +75,8 @@ class GroundTechnical(
     override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
         return Utils.plotVolt(electricalLoad.voltage)
     }
+
+    override fun getAmmeterString(side: net.minecraft.core.Direction?): String {
+        return Utils.plotAmpere(electricalLoad.current)
+    }
 }

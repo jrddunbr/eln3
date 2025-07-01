@@ -72,7 +72,16 @@ class VoltageSourceTechnical(
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
     }
 
-    override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
+    // This is because the voltage source has a set voltage; it's covered by the label.
+    override fun getLabelString(side: net.minecraft.core.Direction?): String {
         return Utils.plotVolt(electricalLoad.voltage)
+    }
+
+    override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
+        return ""
+    }
+
+    override fun getAmmeterString(side: net.minecraft.core.Direction?): String {
+        return "${Utils.plotAmpere(electricalLoad.current)} ${Utils.plotPower(electricalLoad.current * electricalLoad.voltage)}"
     }
 }

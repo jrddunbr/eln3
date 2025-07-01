@@ -67,7 +67,19 @@ class CableTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, l
         probeInfo.text(Utils.plotOhm(electricalLoad.serialResistance))
     }
 
+    override fun getLabelString(side: net.minecraft.core.Direction?): String {
+        return Utils.plotOhm(electricalLoad.blockResistance)
+    }
+
     override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
         return Utils.plotVolt(electricalLoad.voltage)
+    }
+
+    override fun getAmmeterString(side: net.minecraft.core.Direction?): String {
+        return Utils.plotAmpere(electricalLoad.current)
+    }
+
+    override fun getClampingVoltmeterString(side: net.minecraft.core.Direction?): String {
+        return "${super.getClampingVoltmeterString(side)} ${Utils.plotPower(electricalLoad.voltage * electricalLoad.current)}"
     }
 }

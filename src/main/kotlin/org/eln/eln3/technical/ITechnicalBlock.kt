@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.phys.BlockHitResult
-import org.eln.eln3.Eln3
+import org.eln.eln3.registry.ElnItems.AMMETER_ITEM
 import org.eln.eln3.registry.ElnItems.VOLTMETER_ITEM
 
 interface ITechnicalBlock {
@@ -68,6 +68,28 @@ interface ITechnicalBlock {
         TechnicalManager.get(level)?.removeTechnicalsFromLocation(pos, level)
     }
 
+    data class ToolResult(val message: String, val result: ItemInteractionResult)
+
+    interface ToolInterface{
+        fun getTechnicalData(technical: TechnicalBase): ToolResult
+    }
+
+    private fun sendToolMessage(pLevel: Level, pPos: BlockPos, pPlayer: Player, ti: ToolInterface): ItemInteractionResult {
+        val technicalManager = TechnicalManager.get(pLevel)
+        val result = if (technicalManager == null) {
+            ToolResult("Error: No TechnicalManager found", ItemInteractionResult.CONSUME)
+        } else {
+            val technicals = technicalManager.getTechnicalsFromLocation(pPos, pLevel)
+            if (technicals.isEmpty()) {
+                ToolResult("Error: No technical data at $pPos", ItemInteractionResult.CONSUME)
+            } else {
+                val technical = technicals.values.first()
+                ti.getTechnicalData(technical)
+            }
+        }
+        pPlayer.displayClientMessage(Component.literal(result.message), false)
+        return result.result
+    }
 
     fun useItemOnTech(
         pStack: ItemStack,
@@ -79,29 +101,19 @@ interface ITechnicalBlock {
         pHitResult: BlockHitResult
     ): ItemInteractionResult {
         if (pStack.item == VOLTMETER_ITEM.asItem()) {
-            val technicalManager = TechnicalManager.get(pLevel)
-
-            val message = if (technicalManager == null) {
-                "§c[VOLTMETER] Error: No TechnicalManager found"
-            } else {
-                val technicals = technicalManager.getTechnicalsFromLocation(pPos, pLevel)
-                if (technicals.isEmpty()) {
-                    "§c[VOLTMETER] Error: No technical data at $pPos"
-                } else {
-                    val technical = technicals.values.first()
-                    val voltmeterString = technical.getVoltmeterString(null)
-                    if (voltmeterString.isBlank()) {
-                        "§e[VOLTMETER] ${technical.javaClass.simpleName}: No data available"
-                    } else {
-                        "§a[VOLTMETER] $voltmeterString"
-                    }
+            return sendToolMessage(pLevel, pPos, pPlayer, object : ToolInterface {
+                override fun getTechnicalData(technical: TechnicalBase): ToolResult {
+                    return ToolResult("${technical.getLabelString(null)} ${technical.getVoltmeterString(null)}", ItemInteractionResult.CONSUME)
                 }
-            }
-
-            pPlayer.displayClientMessage(Component.literal(message), false)
-            return ItemInteractionResult.CONSUME
+            })
+        } else if (pStack.item == AMMETER_ITEM.asItem()) {
+            return sendToolMessage(pLevel, pPos, pPlayer, object : ToolInterface {
+                override fun getTechnicalData(technical: TechnicalBase): ToolResult {
+                    return ToolResult("${technical.getLabelString(null)} ${technical.getAmmeterString(null)}", ItemInteractionResult.CONSUME)
+                }
+            })
         }
-        return ItemInteractionResult.SUCCESS
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
     }
 
     fun useWithoutItemTech(
@@ -111,6 +123,6 @@ interface ITechnicalBlock {
         pPlayer: Player,
         pHitResult: BlockHitResult
     ): InteractionResult {
-        return InteractionResult.SUCCESS
+        return InteractionResult.PASS
     }
 }

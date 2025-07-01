@@ -208,16 +208,14 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         data: IProbeHitData
     ) {
         try {
-            // Basic technical info
             probeInfo.text("Technical: ${this.javaClass.simpleName}")
             probeInfo.text("UUID: ${uuid.substring(0, 8)}...")
-            probeInfo.text("Connected: ${if (isAdded) "§aYes" else "§cNo"}")
-            probeInfo.text("Connections: ${nodeConnectionList.size}")
-            probeInfo.text("EC: ${nodeConnectionList.sumOf { it.EC.size }}")
-            probeInfo.text("TC: ${nodeConnectionList.sumOf { it.TC.size }}")
 
-            // Simulation info
             if (mode == ProbeMode.DEBUG) {
+                probeInfo.text("Connected: ${if (isAdded) "§aYes" else "§cNo"}")
+                probeInfo.text("Connections: ${nodeConnectionList.size}")
+                probeInfo.text("EC: ${nodeConnectionList.sumOf { it.EC.size }}")
+                probeInfo.text("TC: ${nodeConnectionList.sumOf { it.TC.size }}")
                 probeInfo.text("Debug Info:")
                 probeInfo.text("  Position: $pos")
                 probeInfo.text("  Level: ${level.dimension().location()}")
@@ -334,10 +332,54 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         nbt.putByte("NBWrap", neighborWrapable)
     }
 
+    /**
+     * The characteristics of the component that is an identifying mark or specification.
+     * For example, a resistor might have a color code that indicates 100 ohms.
+     *
+     * @return String about the technical characteristics of the device
+     */
+    open fun getLabelString(side: net.minecraft.core.Direction?): String {
+        return ""
+    }
+
+    /**
+     * The characteristics of the component that can be measured by a basic 2-probe voltmeter.
+     * This can be across the component (eg, voltage drop) or a comparison against ground.
+     *
+     * @return String about the electrical characteristics
+     */
     open fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
         return ""
     }
 
+    /**
+     * The characteristics of the component that can be measured by a clamp ammeter.
+     * If the information can be combined from the label with a simple calculation, it can be shown here.
+     * For example, if you have resistance ohms from the label, you can calculate the power from the current.
+     *
+     * @return String about the electrical characteristics
+     */
+    open fun getAmmeterString(side: net.minecraft.core.Direction?): String {
+        return ""
+    }
+
+    /**
+     * The characteristics of the component that can be measured by a basic 2-probe voltmeter ammeter combo
+     * This typically includes the information from the voltmeter and the ammeter together.
+     * In some cases, it may make sense to provide additional information, such as the power through a wire.
+     *
+     * @return String about the electrical characteristics
+     */
+    open fun getClampingVoltmeterString(side: net.minecraft.core.Direction?): String {
+        return "${getVoltmeterString(side)} ${getAmmeterString(side)}"
+    }
+
+    /**
+     * The characteristics of the component that can be measured by a probe thermometer.
+     * This can be across the component (eg, temperature differential) or a static temperature measurement.
+     *
+     * @return String about the thermal characteristics
+     */
     open fun getThermalProbeString(side: net.minecraft.core.Direction?): String {
         return ""
     }

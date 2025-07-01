@@ -6,4 +6,5 @@ import org.eln.eln3.Eln3.Companion.ITEMS
 
 object ElnItems {
     val VOLTMETER_ITEM: DeferredItem<Item> = ITEMS.registerSimpleItem("voltmeter", Item.Properties().durability(1024))
+    val AMMETER_ITEM: DeferredItem<Item> = ITEMS.registerSimpleItem("ammeter", Item.Properties().durability(1024))
 }

@@ -38,7 +38,7 @@ class ResistorTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos
 
     init {
         electricalLoad.setCanBeSimplifiedByLine(true)
-        electricalLoad.serialResistance = 100.0
+        electricalLoad.blockResistance = 100.0
         electricalLoadList.add(electricalLoad)
     }
 
@@ -60,13 +60,25 @@ class ResistorTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos
     ) {
         super.addProbeInfo(mode, probeInfo, player, world, blockState, data)
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
-        probeInfo.text(Utils.plotOhm(electricalLoad.serialResistance))
+        probeInfo.text(Utils.plotOhm(electricalLoad.blockResistance))
         // P = I^2 * R
-        probeInfo.text(Utils.plotPower("Heat Loss", electricalLoad.current * electricalLoad.current * electricalLoad.serialResistance))
+        probeInfo.text(Utils.plotPower("Heat Loss", electricalLoad.current * electricalLoad.current * electricalLoad.blockResistance))
+    }
+
+    override fun getLabelString(side: net.minecraft.core.Direction?): String {
+        return Utils.plotOhm(electricalLoad.blockResistance)
     }
 
     override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
-        val voltageDrop = electricalLoad.current * electricalLoad.serialResistance
-        return "Resistor: ${Utils.plotOhm(electricalLoad.serialResistance)}, Drop: ${Utils.plotVolt(voltageDrop)}"
+        val voltageDrop = electricalLoad.current * electricalLoad.blockResistance
+        return Utils.plotVolt("ΔV", voltageDrop)
+    }
+
+    override fun getAmmeterString(side: net.minecraft.core.Direction?): String {
+        return "${Utils.plotAmpere(electricalLoad.current)} ${Utils.plotPower(electricalLoad.current * electricalLoad.current * electricalLoad.blockResistance)}"
+    }
+
+    override fun getThermalProbeString(side: net.minecraft.core.Direction?): String {
+        return Utils.plotPower("Heat Loss", electricalLoad.current * electricalLoad.current * electricalLoad.blockResistance)
     }
 }

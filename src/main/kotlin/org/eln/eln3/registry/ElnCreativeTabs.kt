@@ -7,11 +7,11 @@ import net.minecraft.world.item.CreativeModeTabs
 import net.neoforged.neoforge.registries.DeferredHolder
 import org.eln.eln3.Eln3.Companion.CREATIVE_MODE_TABS
 import org.eln.eln3.Eln3.Companion.MODID
-import org.eln.eln3.registry.ElnBlockEntities.SIMPLE_TEST_BLOCK_ITEM
 import org.eln.eln3.registry.ElnBlocks.CABLE_ITEM
 import org.eln.eln3.registry.ElnBlocks.GROUND_ITEM
 import org.eln.eln3.registry.ElnBlocks.RESISTOR_ITEM
 import org.eln.eln3.registry.ElnBlocks.VS_ITEM
+import org.eln.eln3.registry.ElnItems.AMMETER_ITEM
 import org.eln.eln3.registry.ElnItems.VOLTMETER_ITEM
 import java.util.function.Supplier
 
@@ -26,10 +26,11 @@ object ElnCreativeTabs {
                 .displayItems { parameters: ItemDisplayParameters?, output: CreativeModeTab.Output ->
                     output.accept(VS_ITEM.get())
                     output.accept(CABLE_ITEM.get())
+                    output.accept(RESISTOR_ITEM.get())
                     output.accept(GROUND_ITEM.get())
                     output.accept(VOLTMETER_ITEM.get())
-                    output.accept(SIMPLE_TEST_BLOCK_ITEM.get())
-                    output.accept(RESISTOR_ITEM.get())
+                    output.accept(AMMETER_ITEM.get())
+                    //output.accept(SIMPLE_TEST_BLOCK_ITEM.get())
                 }.build()
         })
 }
