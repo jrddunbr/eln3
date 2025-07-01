@@ -61,6 +61,7 @@ class CableTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, l
         blockState: BlockState,
         data: IProbeHitData
     ) {
+        super.addProbeInfo(mode, probeInfo, player, world, blockState, data)
         probeInfo.text(Utils.plotVolt(electricalLoad.voltage))
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
         probeInfo.text(Utils.plotOhm(electricalLoad.serialResistance))

@@ -25,7 +25,7 @@ import kotlin.experimental.or
  *
  * NO CLIENT CALLS IN THIS CLASS
  */
-open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var entity: ITechnicalEntity?, var pos: BlockPos, var level: Level, val uuid: String) {
+open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var entity: ITechnicalEntity?, var pos: BlockPos, var level: Level, var uuid: String) {
     var neighborOpaque: Byte = 0
     var neighborWrapable: Byte = 0
     var nodeConnectionList = ArrayList<TechnicalConnection>(4)
@@ -83,10 +83,14 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
 
 
     var isDestructing = false
+
     fun physicalSelfDestruction(explosionStrength: Float) {
         var explosionStrength = explosionStrength
         if (isDestructing) return
         isDestructing = true
+
+        Eln3.LOGGER.info("SELF_DESTRUCT: Technical $uuid at $pos self-destructing with explosion strength $explosionStrength")
+
         if (!Config.explosions) explosionStrength = 0f
         disconnect()
         level!!.setBlock(pos, Blocks.AIR.defaultBlockState(), 3)
@@ -96,6 +100,8 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         if (explosionStrength != 0f) {
             level!!.explode(null, pos!!.x + 0.5, pos!!.y + 0.5, pos!!.z + 0.5, explosionStrength, Level.ExplosionInteraction.BLOCK)
         }
+
+        Eln3.LOGGER.info("SELF_DESTRUCT: Technical $uuid destruction complete")
     }
 
     /*
@@ -200,7 +206,38 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         world: Level?,
         blockState: BlockState,
         data: IProbeHitData
-    ) {}
+    ) {
+        try {
+            // Basic technical info
+            probeInfo.text("Technical: ${this.javaClass.simpleName}")
+            probeInfo.text("UUID: ${uuid.substring(0, 8)}...")
+            probeInfo.text("Connected: ${if (isAdded) "§aYes" else "§cNo"}")
+            probeInfo.text("Connections: ${nodeConnectionList.size}")
+
+            // Voltage info
+            val voltageInfo = getVoltmeterString(null)
+            if (voltageInfo.isNotBlank()) {
+                probeInfo.text("§e$voltageInfo")
+            } else {
+                probeInfo.text("§cNo voltage data")
+            }
+
+            // Simulation info
+            if (mode == ProbeMode.DEBUG) {
+                probeInfo.text("Debug Info:")
+                probeInfo.text("  Position: $pos")
+                probeInfo.text("  Level: ${level.dimension().location()}")
+                probeInfo.text("  Must Save: ${mustBeSaved()}")
+                probeInfo.text("  Neighbor Opaque: $neighborOpaque")
+                probeInfo.text("  Need Publish: $needPublish")
+            }
+
+        } catch (e: Exception) {
+            probeInfo.text("§cError reading technical data: ${e.message}")
+            Eln3.LOGGER.error("Error in TOP probe for technical at $pos", e)
+        }
+    }
+
 
     open fun connectJob() {
         // EXTERNAL OTHERS SIXNODE

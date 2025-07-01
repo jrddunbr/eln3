@@ -68,6 +68,7 @@ class GroundTechnical(
         blockState: BlockState,
         data: IProbeHitData
     ) {
+        super.addProbeInfo(mode, probeInfo, player, world, blockState, data)
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
     }
 

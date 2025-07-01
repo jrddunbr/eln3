@@ -33,8 +33,10 @@ interface ITechnicalBlock {
         pOldState: BlockState,
         pMovedByPiston: Boolean
     ) {
+        Eln3.LOGGER.info("BLOCK_PLACE: Block placed at $pPos, new: ${pState.block.javaClass.simpleName}, old: ${pOldState.block.javaClass.simpleName}, piston: $pMovedByPiston")
         TechnicalManager.get(pLevel)?.addTechnical(block, pState, null, pPos, pLevel)
     }
+
 
     fun onRemoveTech(
         pState: BlockState,
@@ -43,11 +45,15 @@ interface ITechnicalBlock {
         pNewState: BlockState,
         pMovedByPiston: Boolean
     ) {
+        Eln3.LOGGER.info("BLOCK_REMOVE: Block removed at $pPos, old: ${pState.block.javaClass.simpleName}, new: ${pNewState.block.javaClass.simpleName}, piston: $pMovedByPiston")
         TechnicalManager.get(pLevel)?.removeTechnicalsFromLocation(pPos, pLevel)
     }
 
+
     fun onBlockStateChangeTech(level: LevelReader, pos: BlockPos, oldState: BlockState, newState: BlockState) {
-        // ???
+        if (level is Level) {
+            TechnicalManager.get(level)?.updateTechnicalBlockState(pos, level, newState)
+        }
     }
 
     fun onDestroyedByPlayerTech(
@@ -58,8 +64,10 @@ interface ITechnicalBlock {
         willHarvest: Boolean,
         fluid: FluidState
     ) {
+        Eln3.LOGGER.info("BLOCK_DESTROY: Block destroyed by player at $pos, type: ${state.block.javaClass.simpleName}, willHarvest: $willHarvest")
         TechnicalManager.get(level)?.removeTechnicalsFromLocation(pos, level)
     }
+
 
     fun useItemOnTech(
         pStack: ItemStack,
