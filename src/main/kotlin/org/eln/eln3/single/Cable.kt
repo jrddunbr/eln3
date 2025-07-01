@@ -19,6 +19,7 @@ import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
 import org.eln.eln3.technical.single.SingleBlock
 import org.eln.eln3.technical.single.SingleTechnical
+import java.util.UUID
 
 class CableBlock: SingleBlock() {
     override fun newTechnical(
@@ -27,12 +28,12 @@ class CableBlock: SingleBlock() {
         level: Level,
         entity: ITechnicalEntity?
     ): TechnicalBase {
-        return CableTechnical(this, state, blockPos, level)
+        return CableTechnical(this, state, blockPos, level, UUID.randomUUID().toString())
     }
 }
 
-class CableTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, level: Level):
-    SingleTechnical(block, state, pos, level) {
+class CableTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, level: Level, uuid: String):
+    SingleTechnical(block, state, pos, level, uuid) {
 
     var electricalLoad = NbtElectricalLoad("electricalLoad")
 

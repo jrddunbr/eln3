@@ -106,6 +106,6 @@ open class SingleBlock() :
     }
 
     override fun newTechnical(state: BlockState, blockPos: BlockPos, level: Level, entity: ITechnicalEntity?): TechnicalBase {
-        return SingleTechnical(this, state, blockPos, level)
+        throw RuntimeException("SingleBlock does not support newTechnical, please use an implementation class")
     }
 }

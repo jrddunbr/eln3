@@ -17,6 +17,7 @@ import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
 import org.eln.eln3.technical.single.SingleBlock
 import org.eln.eln3.technical.single.SingleTechnical
+import java.util.UUID
 
 class ResistorBlock: SingleBlock(){
     override fun newTechnical(
@@ -25,12 +26,13 @@ class ResistorBlock: SingleBlock(){
         level: Level,
         entity: ITechnicalEntity?
     ): TechnicalBase {
-        return ResistorTechnical(this, state, blockPos, level)
+        return ResistorTechnical(this, state, blockPos, level, UUID.randomUUID().toString())
     }
 }
 
-class ResistorTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, level: Level):
-    SingleTechnical(block, state, pos, level) {
+class ResistorTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, level: Level,
+                        uuid: String):
+    SingleTechnical(block, state, pos, level, uuid) {
 
     var electricalLoad = NbtElectricalLoad("Resistor")
 

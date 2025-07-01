@@ -115,6 +115,6 @@ open class SingleEntityBlock() :
         level: Level,
         entity: ITechnicalEntity?
     ): TechnicalBase {
-        return SingleEntityTechnical(this, state, entity, blockPos, level)
+        throw RuntimeException("SingleEntityBlock does not support newTechnical, please use an implementation class")
     }
 }

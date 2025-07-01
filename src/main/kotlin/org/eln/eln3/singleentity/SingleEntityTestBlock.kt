@@ -16,6 +16,7 @@ import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
 import org.eln.eln3.technical.single.SingleTechnical
 import org.eln.eln3.technical.singleentity.SingleEntityTechnical
+import java.util.UUID
 
 class SingleEntityTestBlock(properties: Properties) : Block(properties), EntityBlock, ITechnicalBlock {
 
@@ -68,6 +69,6 @@ class SingleEntityTestBlock(properties: Properties) : Block(properties), EntityB
         level: Level,
         entity: ITechnicalEntity?
     ): TechnicalBase {
-        return SingleEntityTechnical(this, state, entity, blockPos, level)
+        return SingleEntityTechnical(this, state, entity, blockPos, level,UUID.randomUUID().toString())
     }
 }

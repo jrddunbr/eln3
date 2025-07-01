@@ -16,7 +16,6 @@ import java.util.function.Consumer
 
 class TechnicalManager: SavedData() {
     private val technicalData: HashMap<String, TechnicalBase> = HashMap()
-    private val previousLoadStorage = mutableMapOf<Pair<Level, BlockPos>, CompoundTag>()
 
     fun addTechnical(block: Block, state: BlockState, entity: BlockEntity?, pos: BlockPos, level: Level) {
         try {
@@ -26,13 +25,6 @@ class TechnicalManager: SavedData() {
                 ite = entity
             }
             val tb = (block as ITechnicalBlock).newTechnical(state, pos, level, ite)
-            if (previousLoadStorage.containsKey(Pair(level, pos))) {
-                val tag = previousLoadStorage[Pair(level, pos)]
-                if (tag != null) {
-                    Eln3.LOGGER.info("Was able to locate prior save data for $level $pos, loading NBT")
-                    tb.readFromNBT(tag)
-                }
-            }
             technicalData[tb.uuid] = tb
             tb.connect()
             setDirty()
@@ -82,6 +74,8 @@ class TechnicalManager: SavedData() {
                 node.putString("uuid", uuid)
                 node.putString("level", tech.level.toString())
                 node.putLong("pos", tech.pos.asLong())
+                node.putString("type", tech.javaClass.name)
+                Eln3.LOGGER.info("Type: ${tech.javaClass.name}")
                 tech.writeToNBT(node)
                 nbt.put(uuid, node)
                 Eln3.LOGGER.info("Saved $tech to NBT.")
@@ -117,11 +111,25 @@ class TechnicalManager: SavedData() {
                 val uuid = data.getString("uuid")
                 val level = levelsByName[data.getString("level")]
                 val pos = BlockPos.of(data.getLong("pos"))
+                val type = data.getString("type")
                 if (level == null) return@forEach
-                tm.previousLoadStorage[Pair(level, pos)] = data
+
+                val tb = level.getBlockState(pos).block as? ITechnicalBlock? ?: return@forEach
+                val tech = tb.newTechnical(level.getBlockState(pos), pos, level, null)
+                tech.readFromNBT(data)
+                tm.technicalData[uuid] = tech
             }
 
-            Eln3.LOGGER.info("Loaded ${tm.previousLoadStorage.size} previous load storage entries.")
+            Eln3.LOGGER.info("Connecting ${tm.technicalData.size} loaded technicals")
+            tm.technicalData.values.forEach { tech ->
+                try {
+                    tech.connect()
+                } catch (e: Exception) {
+                    Eln3.LOGGER.error("Failed to connect technical ${tech.uuid}", e)
+                }
+            }
+
+            Eln3.LOGGER.info("Loaded ${tm.technicalData.size} technicals from NBT: ${tm.technicalData.values.joinToString(", ")}")
             return tm
         }
 

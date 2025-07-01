@@ -19,6 +19,7 @@ import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
 import org.eln.eln3.technical.single.SingleBlock
 import org.eln.eln3.technical.single.SingleTechnical
+import java.util.UUID
 
 
 class GroundBlock: SingleBlock() {
@@ -28,7 +29,7 @@ class GroundBlock: SingleBlock() {
         level: Level,
         entity: ITechnicalEntity?
     ): TechnicalBase {
-        return GroundTechnical(this, state, blockPos, level)
+        return GroundTechnical(this, state, blockPos, level, UUID.randomUUID().toString())
     }
 }
 
@@ -36,8 +37,9 @@ class GroundTechnical(
     block: ITechnicalBlock,
     state: BlockState,
     pos: BlockPos,
-    level: Level
-) : SingleTechnical(block, state, pos, level) {
+    level: Level,
+    uuid: String
+) : SingleTechnical(block, state, pos, level, uuid) {
 
     val voltageSource = VoltageSource("ground")
     val electricalLoad = NbtElectricalLoad("load")

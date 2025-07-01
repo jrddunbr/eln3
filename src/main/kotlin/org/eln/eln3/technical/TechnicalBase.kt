@@ -25,8 +25,7 @@ import kotlin.experimental.or
  *
  * NO CLIENT CALLS IN THIS CLASS
  */
-open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var entity: ITechnicalEntity?, var pos: BlockPos, var level: Level) {
-    val uuid = UUID.randomUUID().toString()
+open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var entity: ITechnicalEntity?, var pos: BlockPos, var level: Level, val uuid: String) {
     var neighborOpaque: Byte = 0
     var neighborWrapable: Byte = 0
     var nodeConnectionList = ArrayList<TechnicalConnection>(4)

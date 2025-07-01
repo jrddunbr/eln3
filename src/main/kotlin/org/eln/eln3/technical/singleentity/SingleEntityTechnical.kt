@@ -14,8 +14,16 @@ import org.eln.eln3.sim.nbt.TagSerializable
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
+import java.util.UUID
 
-open class SingleEntityTechnical(block: ITechnicalBlock, state: BlockState, entity: ITechnicalEntity?, pos: BlockPos, level: Level): TechnicalBase(block, state, entity, pos, level), TagSerializable {
+open class SingleEntityTechnical(
+    block: ITechnicalBlock,
+    state: BlockState,
+    entity: ITechnicalEntity?,
+    pos: BlockPos,
+    level: Level,
+    uuid: String
+): TechnicalBase(block, state, entity, pos, level, uuid), TagSerializable {
 
     var slowProcessList = ArrayList<IProcess>(4)
     var electricalProcessList = ArrayList<IProcess>(4)

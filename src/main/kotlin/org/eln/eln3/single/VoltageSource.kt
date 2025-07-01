@@ -19,6 +19,7 @@ import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
 import org.eln.eln3.technical.single.SingleBlock
 import org.eln.eln3.technical.single.SingleTechnical
+import java.util.UUID
 
 class VoltageSourceBlock: SingleBlock() {
     override fun newTechnical(
@@ -27,7 +28,7 @@ class VoltageSourceBlock: SingleBlock() {
         level: Level,
         entity: ITechnicalEntity?
     ): TechnicalBase {
-        return VoltageSourceTechnical(this, state, blockPos, level)
+        return VoltageSourceTechnical(this, state, blockPos, level, UUID.randomUUID().toString())
     }
 }
 
@@ -35,8 +36,9 @@ class VoltageSourceTechnical(
     block: ITechnicalBlock,
     state: BlockState,
     pos: BlockPos,
-    level: Level
-) : SingleTechnical(block, state, pos, level) {
+    level: Level,
+    uuid: String
+) : SingleTechnical(block, state, pos, level, uuid) {
 
     val voltageSource = VoltageSource("source")
     val electricalLoad = NbtElectricalLoad("load")
