@@ -66,6 +66,7 @@ class ResistorTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos
     }
 
     override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
-        return ""
+        val voltageDrop = electricalLoad.current * electricalLoad.serialResistance
+        return "Resistor: ${Utils.plotOhm(electricalLoad.serialResistance)}, Drop: ${Utils.plotVolt(voltageDrop)}"
     }
 }

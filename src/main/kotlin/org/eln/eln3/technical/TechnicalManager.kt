@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.chunk.ChunkAccess
 import net.minecraft.world.level.saveddata.SavedData
 import net.neoforged.neoforge.server.ServerLifecycleHooks
 import org.eln.eln3.Eln3
@@ -98,14 +99,14 @@ class TechnicalManager: SavedData() {
                 }
                 val node = CompoundTag()
                 node.putString("uuid", uuid)
-                node.putString("level", tech.level.toString())
+                node.putString("level", tech.level.dimension().toString())
                 node.putLong("pos", tech.pos.asLong())
                 node.putString("techType", tech.javaClass.name)
                 node.putString("blockType", tech.block.javaClass.name)
-                Eln3.LOGGER.info("Type: ${tech.javaClass.name}")
+                //Eln3.LOGGER.info("Type: ${tech.javaClass.name}")
                 tech.writeToNBT(node)
                 nbt.put(uuid, node)
-                Eln3.LOGGER.info("Saved $tech to NBT.")
+                //Eln3.LOGGER.info("Saved $tech to NBT.")
             } catch (e: Exception) {
                 Eln3.LOGGER.error("Unable to save NBT for $tech", e)
             }
@@ -127,17 +128,17 @@ class TechnicalManager: SavedData() {
         }
 
         fun load(nbt: CompoundTag, lookup: HolderLookup.Provider): TechnicalManager {
-            Eln3.LOGGER.info("Loading technical data into manager from NBT")
-            technicalData.clear()
+            Eln3.LOGGER.info("Loading technical data from NBT (${nbt.allKeys.size} entries)")
+
+            if (technicalData.isEmpty()) {
+                Eln3.LOGGER.debug("TechnicalManager data is empty, performing full load")
+            } else {
+                Eln3.LOGGER.debug("TechnicalManager already has ${technicalData.size} technicals, skipping load")
+                return create()
+            }
 
             val levelsByName: Map<String, Level> =
-                ServerLifecycleHooks.getCurrentServer()?.allLevels?.associateBy { it.toString() }.orEmpty()
-
-            Eln3.LOGGER.info("Loaded ${levelsByName.size} levels from the server: $levelsByName")
-            Eln3.LOGGER.info("NBT contains ${nbt.allKeys.size} entries: ${nbt.allKeys}")
-
-            // Store all loaded technicals for later validation
-            val allLoadedTechnicals = mutableListOf<TechnicalBase>()
+                ServerLifecycleHooks.getCurrentServer()?.allLevels?.associateBy { it.dimension().toString() }.orEmpty()
 
             nbt.allKeys.forEach { key ->
                 try {
@@ -149,149 +150,77 @@ class TechnicalManager: SavedData() {
                     val savedType = data.getString("techType")
                     val blockTypeName = data.getString("blockType")
 
-                    Eln3.LOGGER.info("Processing technical $uuid at $pos with type $savedType, block type $blockTypeName")
-
                     if (level == null) {
                         Eln3.LOGGER.warn("Skipping technical $uuid: level $levelName not found")
                         return@forEach
                     }
 
-                    // Find the registered block instead of creating a new instance
                     val registeredBlock = findRegisteredBlock(blockTypeName)
                     if (registeredBlock == null) {
-                        Eln3.LOGGER.warn("Skipping technical $uuid: block type $blockTypeName not found in registry")
+                        Eln3.LOGGER.warn("Skipping technical $uuid: block type $blockTypeName not found")
                         return@forEach
                     }
 
                     val block = registeredBlock as? ITechnicalBlock
                     if (block == null) {
-                        Eln3.LOGGER.warn("Skipping technical $uuid: registered block $blockTypeName is not ITechnicalBlock")
+                        Eln3.LOGGER.warn("Skipping technical $uuid: registered block is not ITechnicalBlock")
                         return@forEach
                     }
 
-                    // Create a dummy BlockState
                     val dummyState = registeredBlock.defaultBlockState()
-
-                    // Create the technical
                     val tech = block.newTechnical(dummyState, pos, level, null)
 
-                    // Verify type matches
                     if (savedType != tech.javaClass.name) {
-                        Eln3.LOGGER.error("Type mismatch for $uuid at $pos: saved=$savedType, actual=${tech.javaClass.name}")
+                        Eln3.LOGGER.error("Type mismatch for $uuid: saved=$savedType, actual=${tech.javaClass.name}")
                         return@forEach
                     }
 
-                    // Load NBT data into the technical
                     tech.readFromNBT(data)
-
-                    // Set the saved UUID
                     tech.uuid = uuid
-
-                    allLoadedTechnicals.add(tech)
-                    Eln3.LOGGER.info("Successfully loaded technical $uuid of type $savedType")
+                    technicalData[uuid] = tech
 
                 } catch (e: Exception) {
                     Eln3.LOGGER.error("Failed to load technical from key $key", e)
                 }
             }
-
-            // Schedule validation for after chunks are loaded
-            scheduleChunkLoadValidation(allLoadedTechnicals)
-
-            Eln3.LOGGER.info("Loaded ${allLoadedTechnicals.size} technicals from NBT, validation scheduled for chunk load")
             return create()
         }
 
-        private fun scheduleChunkLoadValidation(allLoadedTechnicals: List<TechnicalBase>) {
-            // Group by position to detect conflicts
-            val positionToTechnicals = allLoadedTechnicals.groupBy { tech ->
-                "${tech.level}_${tech.pos.x}_${tech.pos.y}_${tech.pos.z}"
-            }
-
-            // Add all technicals temporarily
-            allLoadedTechnicals.forEach { tech ->
-                technicalData[tech.uuid] = tech
-            }
-
-            // Schedule validation for next server tick when chunks should be loaded
-            val server = ServerLifecycleHooks.getCurrentServer()
-            if (server != null) {
-                server.executeIfPossible {
-                    validateAndCleanupTechnicals(positionToTechnicals)
-                }
-            }
+        fun clearData() {
+            Eln3.LOGGER.info("Clearing all technical data (${technicalData.size} technicals)")
+            technicalData.clear()
         }
 
-        private fun validateAndCleanupTechnicals(positionToTechnicals: Map<String, List<TechnicalBase>>) {
-            Eln3.LOGGER.info("Starting chunk-loaded validation of ${positionToTechnicals.size} positions")
+        private fun validateTechnical(technical: TechnicalBase): Boolean {
+            val level = technical.level
+            val pos = technical.pos
 
-            positionToTechnicals.forEach { (posKey, techList) ->
-                if (techList.size > 1) {
-                    Eln3.LOGGER.warn("Found ${techList.size} technicals at position $posKey:")
-                    techList.forEach { tech ->
-                        Eln3.LOGGER.warn("  - ${tech.uuid}: ${tech.javaClass.simpleName}")
-                    }
+            if (!level.hasChunk(pos.x shr 4, pos.z shr 4)) {
+                throw RuntimeException("Chunk not loaded for technical at $pos but validation was requested")
+            }
 
-                    val firstTech = techList.first()
-                    val level = firstTech.level
-                    val pos = firstTech.pos
+            val blockAtPos = level.getBlockState(pos).block
+            return blockAtPos is ITechnicalBlock
+        }
 
-                    // Now chunks should be loaded, check what block is actually there
-                    try {
-                        val actualBlock = level.getBlockState(pos).block
-                        if (actualBlock is ITechnicalBlock) {
-                            // Find the technical that matches the actual block
-                            val correctTech = techList.find { tech ->
-                                tech.block.javaClass.name == actualBlock.javaClass.name
-                            }
-
-                            if (correctTech != null) {
-                                Eln3.LOGGER.info("Keeping correct technical ${correctTech.uuid} for ${actualBlock.javaClass.simpleName}")
-                                // Remove the incorrect ones
-                                techList.filter { it != correctTech }.forEach { tech ->
-                                    Eln3.LOGGER.info("Removing incorrect technical ${tech.uuid}")
-                                    technicalData.remove(tech.uuid)
-                                }
-                            } else {
-                                Eln3.LOGGER.warn("No technical matches actual block ${actualBlock.javaClass.simpleName}, keeping first one")
-                                // Remove all but the first
-                                techList.drop(1).forEach { tech ->
-                                    Eln3.LOGGER.info("Removing extra technical ${tech.uuid}")
-                                    technicalData.remove(tech.uuid)
-                                }
-                            }
+        fun validateTechnicalsInChunk(chunk: ChunkAccess) {
+            technicalData
+                .filter { it.value.level == chunk.level }
+                .filter { it.value.pos.x shr 4 == chunk.pos.x && it.value.pos.z shr 4 == chunk.pos.z }
+                .forEach { (uuid, tech) ->
+                    validateTechnical(tech).let { valid ->
+                        if (!valid) {
+                            technicalData.remove(uuid)
                         } else {
-                            Eln3.LOGGER.warn("Block at $pos is not technical (${actualBlock.javaClass.simpleName}), removing all technicals")
-                            // Remove all technicals for this position
-                            techList.forEach { tech ->
-                                Eln3.LOGGER.info("Removing orphaned technical ${tech.uuid}")
-                                technicalData.remove(tech.uuid)
+                            try {
+                                tech.connect()
+                            } catch (e: Exception) {
+                                Eln3.LOGGER.error("Failed to connect technical ${tech.uuid}", e)
                             }
-                        }
-                    } catch (e: Exception) {
-                        Eln3.LOGGER.error("Error validating position $pos", e)
-                        // Keep only the first technical as fallback
-                        techList.drop(1).forEach { tech ->
-                            Eln3.LOGGER.info("Removing technical ${tech.uuid} due to validation error")
-                            technicalData.remove(tech.uuid)
                         }
                     }
                 }
-                // Single technicals are fine, no action needed
-            }
 
-            // Now connect all remaining valid technicals
-            Eln3.LOGGER.info("Connecting ${technicalData.size} validated technicals")
-            technicalData.values.forEach { tech ->
-                try {
-                    tech.connect()
-                } catch (e: Exception) {
-                    Eln3.LOGGER.error("Failed to connect technical ${tech.uuid}", e)
-                }
-            }
-
-            val removedCount = positionToTechnicals.values.sumOf { it.size } - technicalData.size
-            Eln3.LOGGER.info("Validation complete: ${technicalData.size} valid technicals, $removedCount removed")
         }
 
         private fun findRegisteredBlock(blockTypeName: String): Block? {

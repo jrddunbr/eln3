@@ -15,7 +15,8 @@ import net.neoforged.fml.config.ModConfig
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
 import net.neoforged.neoforge.common.NeoForge
-import net.neoforged.neoforge.data.event.GatherDataEvent
+import net.neoforged.neoforge.event.level.ChunkEvent
+import net.neoforged.neoforge.event.level.LevelEvent
 import net.neoforged.neoforge.event.server.ServerStartingEvent
 import net.neoforged.neoforge.event.server.ServerStoppedEvent
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -26,8 +27,8 @@ import org.eln.eln3.registry.ElnCreativeTabs
 import org.eln.eln3.registry.ElnItems
 import org.eln.eln3.sim.MnaConst
 import org.eln.eln3.sim.Simulator
-import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
-
+import org.eln.eln3.technical.TechnicalManager
+import org.eln.eln3.technical.TechnicalManager.Companion.validateTechnicalsInChunk
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Eln3.MODID)
@@ -102,5 +103,15 @@ class Eln3
     @SubscribeEvent
     fun onServerStopped(event: ServerStoppedEvent) {
         //LOGGER.info("HELLO from server stopping")
+    }
+
+    @SubscribeEvent
+    fun onWorldUnload(event: LevelEvent.Unload) {
+        TechnicalManager.Companion.clearData()
+    }
+
+    @SubscribeEvent
+    fun onChunkLoad(event: ChunkEvent.Load) {
+        validateTechnicalsInChunk(event.chunk)
     }
 }

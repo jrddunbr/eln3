@@ -33,7 +33,7 @@ interface ITechnicalBlock {
         pOldState: BlockState,
         pMovedByPiston: Boolean
     ) {
-        Eln3.LOGGER.info("BLOCK_PLACE: Block placed at $pPos, new: ${pState.block.javaClass.simpleName}, old: ${pOldState.block.javaClass.simpleName}, piston: $pMovedByPiston")
+        //Eln3.LOGGER.info("BLOCK_PLACE: Block placed at $pPos, new: ${pState.block.javaClass.simpleName}, old: ${pOldState.block.javaClass.simpleName}, piston: $pMovedByPiston")
         TechnicalManager.get(pLevel)?.addTechnical(block, pState, null, pPos, pLevel)
     }
 
@@ -45,7 +45,7 @@ interface ITechnicalBlock {
         pNewState: BlockState,
         pMovedByPiston: Boolean
     ) {
-        Eln3.LOGGER.info("BLOCK_REMOVE: Block removed at $pPos, old: ${pState.block.javaClass.simpleName}, new: ${pNewState.block.javaClass.simpleName}, piston: $pMovedByPiston")
+        //Eln3.LOGGER.info("BLOCK_REMOVE: Block removed at $pPos, old: ${pState.block.javaClass.simpleName}, new: ${pNewState.block.javaClass.simpleName}, piston: $pMovedByPiston")
         TechnicalManager.get(pLevel)?.removeTechnicalsFromLocation(pPos, pLevel)
     }
 
@@ -64,7 +64,7 @@ interface ITechnicalBlock {
         willHarvest: Boolean,
         fluid: FluidState
     ) {
-        Eln3.LOGGER.info("BLOCK_DESTROY: Block destroyed by player at $pos, type: ${state.block.javaClass.simpleName}, willHarvest: $willHarvest")
+        //Eln3.LOGGER.info("BLOCK_DESTROY: Block destroyed by player at $pos, type: ${state.block.javaClass.simpleName}, willHarvest: $willHarvest")
         TechnicalManager.get(level)?.removeTechnicalsFromLocation(pos, level)
     }
 
@@ -79,9 +79,26 @@ interface ITechnicalBlock {
         pHitResult: BlockHitResult
     ): ItemInteractionResult {
         if (pStack.item == VOLTMETER_ITEM.asItem()) {
-            val voltmeterString = TechnicalManager.get(pLevel)?.getTechnicalsFromLocation(pPos, pLevel)
-                ?.values?.firstOrNull()?.getVoltmeterString(null)?: ""
-            pPlayer.displayClientMessage(Component.literal(voltmeterString), false)
+            val technicalManager = TechnicalManager.get(pLevel)
+
+            val message = if (technicalManager == null) {
+                "§c[VOLTMETER] Error: No TechnicalManager found"
+            } else {
+                val technicals = technicalManager.getTechnicalsFromLocation(pPos, pLevel)
+                if (technicals.isEmpty()) {
+                    "§c[VOLTMETER] Error: No technical data at $pPos"
+                } else {
+                    val technical = technicals.values.first()
+                    val voltmeterString = technical.getVoltmeterString(null)
+                    if (voltmeterString.isBlank()) {
+                        "§e[VOLTMETER] ${technical.javaClass.simpleName}: No data available"
+                    } else {
+                        "§a[VOLTMETER] $voltmeterString"
+                    }
+                }
+            }
+
+            pPlayer.displayClientMessage(Component.literal(message), false)
             return ItemInteractionResult.CONSUME
         }
         return ItemInteractionResult.SUCCESS
