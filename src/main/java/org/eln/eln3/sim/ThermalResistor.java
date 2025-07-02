@@ -17,8 +17,8 @@ public class ThermalResistor implements IProcess {
     @Override
     public void process(double time) {
         double power = (a.temperatureCelsius - b.temperatureCelsius) * thermalResistanceInverse;
-        a.PcTemp -= power;
-        b.PcTemp += power;
+        a.netThermalPowerAccumulator -= power;
+        b.netThermalPowerAccumulator += power;
     }
 
     public double getPower() {
@@ -35,6 +35,6 @@ public class ThermalResistor implements IProcess {
     }
 
     public void highImpedance() {
-        setThermalResistance(1000000000.0);
+        setThermalResistance(ThermalLoad.HIGH_THERMAL_RESISTANCE);
     }
 }

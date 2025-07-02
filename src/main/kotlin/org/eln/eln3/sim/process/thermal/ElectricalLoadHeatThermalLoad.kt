@@ -9,6 +9,6 @@ class ElectricalLoadHeatThermalLoad(var resistor: ElectricalLoad, var load: Ther
         if (resistor.isNotSimulated) return
         val current = resistor.current
         // println("Moving heat: ${current * current * resistor.serialResistance * 2} watts at $resistor $load")
-        load.movePowerTo(current * current * resistor.serialResistance * 2)
+        load.addThermalPower(current * current * resistor.serialResistance * 2)
     }
 }

@@ -57,10 +57,10 @@ open class SingleTechnical(
 
     override fun loadAdditionalData(nbt: CompoundTag, str: String) {
         // TODO: Read front from NBT
-        electricalLoadList.filter {it is TagSerializable}.forEach {
+        electricalLoadList.forEach {
             (it as TagSerializable).loadAdditionalData(nbt, "")
         }
-        thermalLoadList.filter {it is TagSerializable}.forEach {
+        thermalLoadList.forEach {
             (it as TagSerializable).loadAdditionalData(nbt, "")
         }
         electricalComponentList.filter {it is TagSerializable}.forEach {
@@ -85,7 +85,7 @@ open class SingleTechnical(
         electricalLoadList.filter {it is TagSerializable}.forEach {
             (it as TagSerializable).saveAdditionalData(nbt, "")
         }
-        thermalLoadList.filter {it is TagSerializable}.forEach {
+        thermalLoadList.forEach {
             (it as TagSerializable).saveAdditionalData(nbt, "")
         }
         electricalComponentList.filter {it is TagSerializable}.forEach {

@@ -17,7 +17,7 @@ public class FurnaceProcess implements IProcess {
     public void process(double time) {
         double energyConsumed = getPower() * time;
         combustibleEnergy -= energyConsumed;
-        load.PcTemp += energyConsumed / time;
+        load.netThermalPowerAccumulator += energyConsumed / time;
     }
 
     public void setGain(double gain) {

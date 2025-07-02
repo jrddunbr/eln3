@@ -34,7 +34,7 @@ open class BatteryProcess(
         val voltage = computeVoltage()
         voltageSource.voltage = voltage
         if (wasteQ > 0) {
-            thermalLoad.movePowerTo(Math.abs(voltageSource.current * voltage))
+            thermalLoad.addThermalPower(Math.abs(voltageSource.current * voltage))
         }
     }
 

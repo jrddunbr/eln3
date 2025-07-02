@@ -56,7 +56,8 @@ public class RootSystem {
     }
 
     public void addState(State s) {
-        for (Component c : (ArrayList<Component>) s.getConnectedComponentsNotAbstracted().clone()) {
+        List<Component> components = new ArrayList<>(s.getConnectedComponentsNotAbstracted());
+        for (Component c : components) {
             if (c.getSubSystem() != null)
                 breakSystems(c.getSubSystem());
         }
@@ -376,10 +377,7 @@ public class RootSystem {
         processPre.remove(p);
     }
 
-    public boolean isRegistred(ElectricalLoad load) {
+    public boolean isRegistered(ElectricalLoad load) {
         return load.getSubSystem() != null || addStates.contains(load);
     }
 }
-
-//TODO: garbadge collector
-//TODO: ghost suprresion

@@ -1,15 +1,14 @@
-package org.eln.eln3.sim;
+package org.eln.eln3.sim.nbt;
 
 import net.minecraft.nbt.CompoundTag;
 import org.eln.eln3.sim.mna.state.VoltageState;
-import org.eln.eln3.sim.nbt.TagSerializable;
 import org.jetbrains.annotations.NotNull;
 
-public class NodeVoltageState extends VoltageState implements TagSerializable {
+public class NbtVoltageState extends VoltageState implements TagSerializable {
 
     String name;
 
-    public NodeVoltageState(String name) {
+    public NbtVoltageState(String name) {
         super();
         this.name = name;
     }

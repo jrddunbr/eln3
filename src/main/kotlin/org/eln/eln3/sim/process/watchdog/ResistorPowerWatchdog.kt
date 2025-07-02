@@ -1,4 +1,4 @@
-package org.eln.eln3.sim.process.destruct
+package org.eln.eln3.sim.process.watchdog
 
 import org.eln.eln3.sim.mna.component.Resistor
 

@@ -393,7 +393,6 @@ object Utils {
     }*/
 
     fun dropItem(itemStack: ItemStack, level: Level, pos: BlockPos) {
-        if (itemStack == null) return
         val doTileDrops = level.gameRules.getBoolean(GameRules.RULE_DOENTITYDROPS)
         if (doTileDrops) {
             val range = 0.7
@@ -1091,10 +1090,6 @@ object Utils {
 
     fun getItemId(stack: ItemStack): Int {
         return Item.getId(stack.item)
-    }
-
-    fun getItemId(block: Block): Int {
-        return Item.getId(Item.byBlock(block))
     }
 
     /*

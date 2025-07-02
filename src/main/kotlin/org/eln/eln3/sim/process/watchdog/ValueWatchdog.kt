@@ -1,9 +1,10 @@
-package org.eln.eln3.sim.process.destruct
+package org.eln.eln3.sim.process.watchdog
 
 import org.eln.eln3.Config
 import org.eln.eln3.Eln3
 import org.eln.eln3.misc.Utils
 import org.eln.eln3.sim.IProcess
+import org.eln.eln3.sim.process.destruct.IDestructible
 
 abstract class ValueWatchdog : IProcess {
     private var destructible: IDestructible? = null

@@ -1,16 +1,13 @@
 package org.eln.eln3.sim;
 
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import org.eln.eln3.Eln3;
 import org.eln.eln3.misc.Utils;
 import org.eln.eln3.sim.mna.RootSystem;
 import org.eln.eln3.sim.mna.component.Component;
 import org.eln.eln3.sim.mna.state.State;
 import org.eln.eln3.sim.process.destruct.IDestructible;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -446,36 +443,46 @@ public class Simulator /* ,IPacketHandler */ {
     }
 
     public boolean isRegistred(ElectricalLoad load) {
-        return mna.isRegistred(load);
+        return mna.isRegistered(load);
     }
 
     void thermalStep(double dt, Iterable<ThermalConnection> connectionList, Iterable<IProcess> processList, Iterable<ThermalLoad> loadList) {
         // Compute heat transferred over each thermal connection:
         for (ThermalConnection c : connectionList) {
-            double i;
-            i = (c.L2.temperatureCelsius - c.L1.temperatureCelsius) / ((c.L2.Rs + c.L1.Rs));
-            c.L1.PcTemp += i;
-            c.L2.PcTemp -= i;
+            double heatFlow;
 
-            c.L1.PrsTemp += Math.abs(i);
-            c.L2.PrsTemp += Math.abs(i);
+            // Use the connection's own thermal resistance
+            if (c.thermalResistance == 0.0) {
+                // Perfect thermal connection - use a very small resistance to avoid division by zero
+                heatFlow = (c.L2.temperatureCelsius - c.L1.temperatureCelsius) / 1e-9;
+            } else {
+                heatFlow = (c.L2.temperatureCelsius - c.L1.temperatureCelsius) / c.thermalResistance;
+            }
+
+            c.L1.netThermalPowerAccumulator += heatFlow;
+            c.L2.netThermalPowerAccumulator -= heatFlow;
+
+            double absHeatFlow = Math.abs(heatFlow);
+            c.L1.conductiveHeatTransferAccumulator += absHeatFlow;
+            c.L2.conductiveHeatTransferAccumulator += absHeatFlow;
         }
+
         if (processList != null) {
             for (IProcess process : processList) {
                 process.process(dt);
             }
         }
+
         for (ThermalLoad load : loadList) {
-            load.PcTemp -= load.temperatureCelsius / load.Rp;
-
-            load.temperatureCelsius += load.PcTemp * dt / load.heatCapacity;
-
-            load.Pc = load.PcTemp;
-            load.Prs = load.PrsTemp;
-            load.Psp = load.PspTemp;
-            load.PcTemp = 0;
-            load.PrsTemp = 0;
-            load.PspTemp = 0;
+            load.netThermalPowerAccumulator -= load.temperatureCelsius / load.thermalResistanceToAmbient;
+            load.temperatureCelsius += load.netThermalPowerAccumulator * dt / load.heatCapacity;
+            load.netThermalPower = load.netThermalPowerAccumulator;
+            load.conductiveHeatTransfer = load.conductiveHeatTransferAccumulator;
+            load.totalThermalActivity = load.thermalActivityAccumulator;
+            load.netThermalPowerAccumulator = 0;
+            load.conductiveHeatTransferAccumulator = 0;
+            load.thermalActivityAccumulator = 0;
         }
     }
+
 }

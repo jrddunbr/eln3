@@ -62,7 +62,7 @@ open class SingleEntityTechnical(
         electricalLoadList.filter {it is TagSerializable}.forEach {
             (it as TagSerializable).loadAdditionalData(nbt, "")
         }
-        thermalLoadList.filter {it is TagSerializable}.forEach {
+        thermalLoadList.forEach {
             (it as TagSerializable).loadAdditionalData(nbt, "")
         }
         electricalComponentList.filter {it is TagSerializable}.forEach {
@@ -87,7 +87,7 @@ open class SingleEntityTechnical(
         electricalLoadList.filter {it is TagSerializable}.forEach {
             (it as TagSerializable).saveAdditionalData(nbt, "")
         }
-        thermalLoadList.filter {it is TagSerializable}.forEach {
+        thermalLoadList.forEach {
             (it as TagSerializable).saveAdditionalData(nbt, "")
         }
         electricalComponentList.filter {it is TagSerializable}.forEach {

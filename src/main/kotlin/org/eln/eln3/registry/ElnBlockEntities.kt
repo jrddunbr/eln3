@@ -12,6 +12,7 @@ import org.eln.eln3.singleentity.SingleEntityTestBlock
 import org.eln.eln3.singleentity.SingleEntityTestBlockEntity
 import java.util.function.Supplier
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 object ElnBlockEntities {
 
     val simpleTestBlockSupplier: Supplier<SingleEntityTestBlock> = Supplier { SingleEntityTestBlock(
