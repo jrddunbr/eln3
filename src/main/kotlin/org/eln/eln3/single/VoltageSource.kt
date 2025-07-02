@@ -4,11 +4,11 @@ import mcjty.theoneprobe.api.IProbeHitData
 import mcjty.theoneprobe.api.IProbeInfo
 import mcjty.theoneprobe.api.ProbeMode
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import org.eln.eln3.misc.Utils
-import org.eln.eln3.position.Direction
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.sim.ElectricalLoad
 import org.eln.eln3.sim.MnaConst
@@ -73,15 +73,15 @@ class VoltageSourceTechnical(
     }
 
     // This is because the voltage source has a set voltage; it's covered by the label.
-    override fun getLabelString(side: net.minecraft.core.Direction?): String {
+    override fun getLabelString(side: Direction?): String {
         return Utils.plotVolt(electricalLoad.voltage)
     }
 
-    override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
+    override fun getVoltmeterString(side: Direction?): String {
         return ""
     }
 
-    override fun getAmmeterString(side: net.minecraft.core.Direction?): String {
+    override fun getAmmeterString(side: Direction?): String {
         return "${Utils.plotAmpere(electricalLoad.current)} ${Utils.plotPower(electricalLoad.current * electricalLoad.voltage)}"
     }
 }

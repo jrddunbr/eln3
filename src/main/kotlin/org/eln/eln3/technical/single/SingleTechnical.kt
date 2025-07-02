@@ -13,8 +13,6 @@ import org.eln.eln3.sim.nbt.NbtThermalLoad
 import org.eln.eln3.sim.nbt.TagSerializable
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.TechnicalBase
-import org.eln.eln3.technical.TechnicalManager
-import java.util.UUID
 
 open class SingleTechnical(
     block: ITechnicalBlock,

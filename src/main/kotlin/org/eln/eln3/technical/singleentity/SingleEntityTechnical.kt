@@ -14,7 +14,6 @@ import org.eln.eln3.sim.nbt.TagSerializable
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
-import java.util.UUID
 
 open class SingleEntityTechnical(
     block: ITechnicalBlock,

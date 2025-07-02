@@ -4,11 +4,11 @@ import mcjty.theoneprobe.api.IProbeHitData
 import mcjty.theoneprobe.api.IProbeInfo
 import mcjty.theoneprobe.api.ProbeMode
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import org.eln.eln3.misc.Utils
-import org.eln.eln3.position.Direction
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.sim.ElectricalLoad
 import org.eln.eln3.sim.MnaConst
@@ -72,11 +72,11 @@ class GroundTechnical(
         probeInfo.text(Utils.plotAmpere(electricalLoad.current))
     }
 
-    override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
+    override fun getVoltmeterString(side: Direction?): String {
         return Utils.plotVolt(electricalLoad.voltage)
     }
 
-    override fun getAmmeterString(side: net.minecraft.core.Direction?): String {
+    override fun getAmmeterString(side: Direction?): String {
         return Utils.plotAmpere(electricalLoad.current)
     }
 }

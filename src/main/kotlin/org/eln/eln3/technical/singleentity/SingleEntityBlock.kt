@@ -18,7 +18,6 @@ import net.minecraft.world.phys.BlockHitResult
 import org.eln.eln3.technical.ITechnicalBlock
 import org.eln.eln3.technical.ITechnicalEntity
 import org.eln.eln3.technical.TechnicalBase
-import org.eln.eln3.technical.single.SingleTechnical
 
 open class SingleEntityBlock() :
     Block(Properties.of().mapColor(MapColor.STONE)), EntityBlock, ITechnicalBlock {

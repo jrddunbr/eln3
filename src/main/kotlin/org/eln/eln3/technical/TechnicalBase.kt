@@ -5,6 +5,7 @@ import mcjty.theoneprobe.api.IProbeHitData
 import mcjty.theoneprobe.api.IProbeInfo
 import mcjty.theoneprobe.api.ProbeMode
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
@@ -12,7 +13,6 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import org.eln.eln3.Config
 import org.eln.eln3.Eln3
-import org.eln.eln3.position.Direction
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.position.LRDUCubeMask
 import org.eln.eln3.sim.*
@@ -33,32 +33,27 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
     private var isAdded = false
     var needPublish = false
 
-
     open fun mustBeSaved(): Boolean {
         return true
     }
 
-    /*
-    open fun networkUnserialize(stream: DataInputStream, player: EntityPlayerMP?) {}
-    fun notifyNeighbor() {
-        coordinate.world().notifyBlockChange(coordinate.x, coordinate.y, coordinate.z, coordinate.block)
-    }
-     */
-
-
     var lrduCubeMask = LRDUCubeMask()
+
     fun neighborBlockRead() {
-        val vector = IntArray(3)
         neighborOpaque = 0
         neighborWrapable = 0
-        for (direction in Direction.values()) {
-            vector[0] = pos!!.x
-            vector[1] = pos!!.y
-            vector[2] = pos!!.z
-            direction.applyTo(vector, 1)
-            val b = level!!.getBlockState(BlockPos(vector[0], vector[1], vector[2])).block
-            neighborOpaque = neighborOpaque or (1 shl direction.int).toByte()
-            if (Companion.isBlockWrappable(level, pos!!)) neighborWrapable = neighborWrapable or (1 shl direction.int).toByte()
+        for (direction in Direction.entries) {
+            val neighborPos = pos.relative(direction)
+            val blockState = level.getBlockState(neighborPos)
+            val block = blockState.block
+
+            // Set opaque bit for this direction
+            neighborOpaque = neighborOpaque or (1 shl direction.ordinal).toByte()
+
+            // Set wrappable bit if the block at the neighbor position is wrappable
+            if (isBlockWrappable(level, neighborPos)) {
+                neighborWrapable = neighborWrapable or (1 shl direction.ordinal).toByte()
+            }
         }
     }
 
@@ -73,14 +68,15 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         }
     }
 
-    fun isBlockWrappable(direction: Direction): Boolean {
-        return neighborWrapable.toInt() shr direction.int and 1 != 0
+    // Used for 6 node
+    fun isBlockWrappable(direction: net.minecraft.core.Direction): Boolean {
+        return neighborWrapable.toInt() shr direction.ordinal and 1 != 0
     }
 
-    fun isBlockOpaque(direction: Direction): Boolean {
-        return neighborOpaque.toInt() shr direction.int and 1 != 0
+    // Used for 6 node
+    fun isBlockOpaque(direction: net.minecraft.core.Direction): Boolean {
+        return neighborOpaque.toInt() shr direction.ordinal and 1 != 0
     }
-
 
     var isDestructing = false
 
@@ -93,71 +89,23 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
 
         if (!Config.explosions) explosionStrength = 0f
         disconnect()
-        level!!.setBlock(pos, Blocks.AIR.defaultBlockState(), 3)
+        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3)
 
         TechnicalManager.use(level) { t -> t.removeTechnical(uuid) }
 
         if (explosionStrength != 0f) {
-            level!!.explode(null, pos!!.x + 0.5, pos!!.y + 0.5, pos!!.z + 0.5, explosionStrength, Level.ExplosionInteraction.BLOCK)
+            level.explode(null, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, explosionStrength, Level.ExplosionInteraction.BLOCK)
         }
 
         Eln3.LOGGER.info("SELF_DESTRUCT: Technical $uuid destruction complete")
     }
 
-    /*
-    fun onBlockPlacedBy(coordinate: Coordinate, front: Direction, entityLiving: EntityLivingBase?, itemStack: ItemStack?) {
-        neighborBlockRead()
-        TechnicalManager.instance!!.addNode(this)
-        initializeFromThat(front, entityLiving, itemStack)
-        if (itemStack != null) println("Node::constructor( meta = " + itemStack.damageValue + ")")
-    }
-     */
-
-    //abstract fun initializeFromThat(front: Direction, entityLiving: EntityLivingBase?, itemStack: ItemStack?)
-
     fun getNeighbor(direction: Direction): List<TechnicalBase> {
-        val position = IntArray(3)
-        position[0] = pos!!.x
-        position[1] = pos!!.y
-        position[2] = pos!!.z
-        direction.applyTo(position, 1)
-        val testPos = BlockPos(position[0], position[1], position[2])
+        val testPos = pos.relative(direction)
         return TechnicalManager.get(level)?.getTechnicalsFromLocation(testPos, level)?.values?.toList()?: listOf()
     }
 
-
     /*
-    open fun onBreakBlock() {
-        isDestructing = true
-        disconnect()
-        TechnicalManager.instance!!.removeNode(this)
-        println("Node::onBreakBlock()")
-    }
-     */
-
-    /*
-    open fun onBlockActivated(entityPlayer: EntityPlayer, side: Direction, vx: Float, vy: Float, vz: Float): Boolean {
-        if (!entityPlayer.worldObj.isRemote && entityPlayer.currentEquippedItem != null) {
-            val equipped = entityPlayer.currentEquippedItem
-            if (Eln.multiMeterElement.checkSameItemStack(equipped)) {
-                val str = multiMeterString(side)
-                addChatMessage(entityPlayer, str)
-                return true
-            }
-            if (Eln.thermometerElement.checkSameItemStack(equipped)) {
-                val str = thermoMeterString(side)
-                addChatMessage(entityPlayer, str)
-                return true
-            }
-            if (Eln.allMeterElement.checkSameItemStack(equipped)) {
-                val str1 = multiMeterString(side)
-                val str2 = thermoMeterString(side)
-                var str = ""
-                str += str1
-                str += str2
-                if (str != "") addChatMessage(entityPlayer, str)
-                return true
-            }
             if (Eln.configCopyToolElement.checkSameItemStack(equipped)) {
                 if (!equipped.hasTagCompound()) {
                     equipped.tagCompound = CompoundTag()
@@ -179,14 +127,6 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
                 ).play()
                 println(String.format("NB.oBA: act %s data %s", act, equipped.tagCompound.toString()))
                 return true
-            }
-        }
-        if (hasGui(side)) {
-            entityPlayer.openGui(Eln.instance, GuiHandler.nodeBaseOpen + side.int, coordinate.world(), coordinate.x, coordinate.y, coordinate.z)
-            return true
-        }
-        return false
-    }
      */
 
     fun reconnect() {
@@ -260,12 +200,12 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
                 }
             }
         }*/
-        for (dir in Direction.entries) {
+
+        net.minecraft.core.Direction.values().forEach { dir ->
             val otherNode = getNeighbor(dir).firstOrNull()
-            //Eln3.LOGGER.info("Trying to connect $pos to ${otherNode?.pos}")
             if (otherNode != null && otherNode.isAdded) {
-                for (lrdu in LRDU.entries) {
-                    tryConnectTwoNode(this, dir, lrdu, otherNode, dir.inverse, lrdu.inverseIfLR())
+                LRDU.entries.forEach { lrdu ->
+                    tryConnectTwoNode(this, dir, lrdu, otherNode, dir.opposite, lrdu.inverseIfLR())
                 }
             }
         }
@@ -483,7 +423,6 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         }
     }*/
 
-    //abstract fun initializeFromNBT()
     open fun globalBoot() {}
     fun needPublish() {
         needPublish = true
@@ -492,7 +431,6 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
     open fun unload() {
         disconnect()
     }
-
 
     companion object {
         const val maskElectricalPower = 1 shl 0
@@ -515,8 +453,6 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         const val networkSerializeUFactor = 10.0
         const val networkSerializeIFactor = 100.0
         const val networkSerializeTFactor = 10.0
-        var teststatic = 0
-
 
         fun isBlockWrappable(testLevel: Level?, testPos: BlockPos): Boolean {
 
@@ -537,7 +473,7 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
         //var beepDownloaded = SoundCommand("eln:beep_accept").smallRange()!!
         //var beepError = SoundCommand("eln:beep_error").smallRange()!!
 
-        fun tryConnectTwoNode(nodeA: TechnicalBase, directionA: Direction, lrduA: LRDU, nodeB: TechnicalBase, directionB: Direction, lrduB: LRDU) {
+        fun tryConnectTwoNode(nodeA: TechnicalBase, directionA: net.minecraft.core.Direction, lrduA: LRDU, nodeB: TechnicalBase, directionB: net.minecraft.core.Direction, lrduB: LRDU) {
             //Eln3.LOGGER.info("Trying to connect two nodes: $nodeA, $nodeB")
             val mskA = nodeA.getSideConnectionMask(directionA, lrduA)
             val mskB = nodeB.getSideConnectionMask(directionB, lrduB)
@@ -566,7 +502,7 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
                     }
                 }
                 var tLoad: ThermalLoad?
-                if (nodeA.getThermalLoad(directionA, lrduA, mskB).also { tLoad = it } != null) {
+                if (nodeA.getThermalLoad(directionA, lrduA, mskB).also { tLoad = it} != null) {
                     val otherTLoad = nodeB.getThermalLoad(directionB, lrduB, mskA)
                     if (otherTLoad != null) {
                         tCon = ThermalConnection(tLoad, otherTLoad)

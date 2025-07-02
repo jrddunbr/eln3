@@ -1,7 +1,6 @@
 package org.eln.eln3.sim;
 
 import org.eln.eln3.misc.Utils;
-import org.eln.eln3.position.Coordinate;
 
 import java.util.List;
 /*

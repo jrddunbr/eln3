@@ -4,12 +4,11 @@ import mcjty.theoneprobe.api.IProbeHitData
 import mcjty.theoneprobe.api.IProbeInfo
 import mcjty.theoneprobe.api.ProbeMode
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
-import org.eln.eln3.Eln3
 import org.eln.eln3.misc.Utils
-import org.eln.eln3.position.Direction
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.sim.ElectricalLoad
 import org.eln.eln3.sim.MnaConst
@@ -49,7 +48,6 @@ class CableTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, l
     }
 
     override fun getSideConnectionMask(side: Direction, lrdu: LRDU): Int {
-        //Eln3.LOGGER.info("Connection mask: ${Companion.maskElectricalAll}")
         return maskElectricalAll
     }
 
@@ -67,19 +65,19 @@ class CableTechnical(block: ITechnicalBlock, state: BlockState, pos: BlockPos, l
         probeInfo.text(Utils.plotOhm(electricalLoad.serialResistance))
     }
 
-    override fun getLabelString(side: net.minecraft.core.Direction?): String {
+    override fun getLabelString(side: Direction?): String {
         return Utils.plotOhm(electricalLoad.blockResistance)
     }
 
-    override fun getVoltmeterString(side: net.minecraft.core.Direction?): String {
+    override fun getVoltmeterString(side: Direction?): String {
         return Utils.plotVolt(electricalLoad.voltage)
     }
 
-    override fun getAmmeterString(side: net.minecraft.core.Direction?): String {
+    override fun getAmmeterString(side: Direction?): String {
         return Utils.plotAmpere(electricalLoad.current)
     }
 
-    override fun getClampingVoltmeterString(side: net.minecraft.core.Direction?): String {
+    override fun getClampingVoltmeterString(side: Direction?): String {
         return "${super.getClampingVoltmeterString(side)} ${Utils.plotPower(electricalLoad.voltage * electricalLoad.current)}"
     }
 }
