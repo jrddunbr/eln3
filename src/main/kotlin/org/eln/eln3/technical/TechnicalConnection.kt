@@ -4,7 +4,7 @@ import net.minecraft.core.Direction
 import org.eln.eln3.Eln3
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.sim.ElectricalConnection
-import org.eln.eln3.sim.ThermalConnection
+import org.eln.eln3.sim.thermal.ThermalConnection
 
 class TechnicalConnection(
     var N1: TechnicalBase,

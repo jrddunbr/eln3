@@ -7,6 +7,8 @@ import org.eln.eln3.sim.mna.RootSystem;
 import org.eln.eln3.sim.mna.component.Component;
 import org.eln.eln3.sim.mna.state.State;
 import org.eln.eln3.sim.process.destruct.IDestructible;
+import org.eln.eln3.sim.thermal.ThermalConnection;
+import org.eln.eln3.sim.thermal.ThermalLoad;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -377,7 +379,8 @@ public class Simulator /* ,IPacketHandler */ {
                 stackStart = System.nanoTime();
                 // / Utils.print("*");
 
-                thermalStep(thermalPeriod, thermalFastConnectionList, thermalFastProcessList, thermalFastLoadList);
+                ThermalLoad.Companion.thermalStep(thermalPeriod, thermalFastConnectionList, thermalFastProcessList, thermalFastLoadList);
+                //thermalStep(thermalPeriod, thermalFastConnectionList, thermalFastProcessList, thermalFastLoadList);
 
                 thermalFastNsStack += System.nanoTime() - stackStart;
             }
@@ -388,7 +391,9 @@ public class Simulator /* ,IPacketHandler */ {
 
         {
             stackStart = System.nanoTime();
-            thermalStep(0.05, thermalSlowConnectionList, thermalSlowProcessList, thermalSlowLoadList);
+
+            ThermalLoad.Companion.thermalStep(0.05, thermalSlowConnectionList, thermalSlowProcessList, thermalSlowLoadList);
+            ///thermalStep(0.05, thermalSlowConnectionList, thermalSlowProcessList, thermalSlowLoadList);
             thermalSlowNsStack += System.nanoTime() - stackStart;
         }
 
@@ -442,47 +447,7 @@ public class Simulator /* ,IPacketHandler */ {
         }
     }
 
-    public boolean isRegistred(ElectricalLoad load) {
+    public boolean isRegistered(ElectricalLoad load) {
         return mna.isRegistered(load);
     }
-
-    void thermalStep(double dt, Iterable<ThermalConnection> connectionList, Iterable<IProcess> processList, Iterable<ThermalLoad> loadList) {
-        // Compute heat transferred over each thermal connection:
-        for (ThermalConnection c : connectionList) {
-            double heatFlow;
-
-            // Use the connection's own thermal resistance
-            if (c.thermalResistance == 0.0) {
-                // Perfect thermal connection - use a very small resistance to avoid division by zero
-                heatFlow = (c.L2.temperatureCelsius - c.L1.temperatureCelsius) / 1e-9;
-            } else {
-                heatFlow = (c.L2.temperatureCelsius - c.L1.temperatureCelsius) / c.thermalResistance;
-            }
-
-            c.L1.netThermalPowerAccumulator += heatFlow;
-            c.L2.netThermalPowerAccumulator -= heatFlow;
-
-            double absHeatFlow = Math.abs(heatFlow);
-            c.L1.conductiveHeatTransferAccumulator += absHeatFlow;
-            c.L2.conductiveHeatTransferAccumulator += absHeatFlow;
-        }
-
-        if (processList != null) {
-            for (IProcess process : processList) {
-                process.process(dt);
-            }
-        }
-
-        for (ThermalLoad load : loadList) {
-            load.netThermalPowerAccumulator -= load.temperatureCelsius / load.thermalResistanceToAmbient;
-            load.temperatureCelsius += load.netThermalPowerAccumulator * dt / load.heatCapacity;
-            load.netThermalPower = load.netThermalPowerAccumulator;
-            load.conductiveHeatTransfer = load.conductiveHeatTransferAccumulator;
-            load.totalThermalActivity = load.thermalActivityAccumulator;
-            load.netThermalPowerAccumulator = 0;
-            load.conductiveHeatTransferAccumulator = 0;
-            load.thermalActivityAccumulator = 0;
-        }
-    }
-
 }

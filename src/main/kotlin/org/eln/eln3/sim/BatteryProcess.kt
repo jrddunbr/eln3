@@ -3,6 +3,7 @@ package org.eln.eln3.sim
 import org.eln.eln3.misc.FunctionTable
 import org.eln.eln3.sim.mna.component.VoltageSource
 import org.eln.eln3.sim.mna.state.VoltageState
+import org.eln.eln3.sim.thermal.ThermalLoad
 
 open class BatteryProcess(
     var positiveLoad: VoltageState?,

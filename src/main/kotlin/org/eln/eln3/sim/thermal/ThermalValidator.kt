@@ -1,4 +1,6 @@
-package org.eln.eln3.sim
+package org.eln.eln3.sim.thermal
+
+import org.eln.eln3.sim.MnaConst
 
 object ThermalValidator {
     private fun getMinimalThermalC(Rs: Double, Rp: Double): Double {

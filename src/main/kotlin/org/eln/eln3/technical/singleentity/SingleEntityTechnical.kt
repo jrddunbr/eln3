@@ -6,7 +6,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import org.eln.eln3.Eln3
 import org.eln.eln3.sim.IProcess
-import org.eln.eln3.sim.ThermalConnection
+import org.eln.eln3.sim.thermal.ThermalConnection
 import org.eln.eln3.sim.mna.component.Component
 import org.eln.eln3.sim.mna.state.State
 import org.eln.eln3.sim.nbt.NbtThermalLoad

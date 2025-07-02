@@ -16,6 +16,8 @@ import org.eln.eln3.Eln3
 import org.eln.eln3.position.LRDU
 import org.eln.eln3.position.LRDUCubeMask
 import org.eln.eln3.sim.*
+import org.eln.eln3.sim.thermal.ThermalConnection
+import org.eln.eln3.sim.thermal.ThermalLoad
 import java.io.DataOutputStream
 import java.util.*
 import kotlin.experimental.or
@@ -505,7 +507,7 @@ open class TechnicalBase(var block: ITechnicalBlock, var state: BlockState, var 
                 if (nodeA.getThermalLoad(directionA, lrduA, mskB).also { tLoad = it} != null) {
                     val otherTLoad = nodeB.getThermalLoad(directionB, lrduB, mskA)
                     if (otherTLoad != null) {
-                        tCon = ThermalConnection(tLoad, otherTLoad)
+                        tCon = ThermalConnection(tLoad?: throw RuntimeException("tLoad was null"), otherTLoad)
                         Eln3.simulator.addThermalConnection(tCon)
                         nodeConnection.addConnection(tCon)
                     }

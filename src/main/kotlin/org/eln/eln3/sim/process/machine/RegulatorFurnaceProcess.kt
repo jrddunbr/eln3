@@ -1,23 +1,13 @@
-package org.eln.eln3.sim;
+package org.eln.eln3.sim.process.machine
 
-/*
-public class RegulatorFurnaceProcess extends RegulatorProcess {
+import org.eln.eln3.sim.process.thermal.FurnaceProcess
 
-    FurnaceProcess furnace;
 
-    public RegulatorFurnaceProcess(String name, FurnaceProcess furnace) {
-        super(name);
-        this.furnace = furnace;
-    }
+class RegulatorFurnaceProcess(name: String?, var furnace: FurnaceProcess) : RegulatorProcess(name) {
+    override val hit: Double
+        get() = furnace.load.temperatureCelsius
 
-    @Override
-    protected double getHit() {
-        return furnace.load.temperatureCelsius;
-    }
-
-    @Override
-    protected void setCmd(double cmd) {
-        furnace.setGain(cmd);
+    override fun setCmd(cmd: Double) {
+        furnace.setGain(cmd)
     }
 }
-*/

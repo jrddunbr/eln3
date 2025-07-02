@@ -1,6 +1,6 @@
 package org.eln.eln3.sim.process.watchdog
 
-import org.eln.eln3.sim.ThermalLoad
+import org.eln.eln3.sim.thermal.ThermalLoad
 
 class ThermalLoadWatchDog(var state: ThermalLoad): ValueWatchdog() {
 

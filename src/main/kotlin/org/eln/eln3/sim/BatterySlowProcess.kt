@@ -1,6 +1,7 @@
 package org.eln.eln3.sim
 
 import org.eln.eln3.Config
+import org.eln.eln3.sim.thermal.ThermalLoad
 
 abstract class BatterySlowProcess(private var batteryProcess: BatteryProcess, var thermalLoad: ThermalLoad) : IProcess {
 
